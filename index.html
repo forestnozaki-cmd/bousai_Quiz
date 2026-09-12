@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>防災チャレンジ｜あなたは災害時、生き残れる？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-deep:#132444;
+    --gold:#B7862C;
+    --gold-soft:#E4C179;
+    --soba:#7B5233;
+    --paper:#FAF3E6;
+    --paper-deep:#F1E6D2;
+    --ink:#2A2420;
+    --ink-soft:#6b6156;
+    --ok:#2E7D46;
+    --ng:#B23B2E;
+    --line:#DDCBA8;
+    --radius:18px;
+    --shadow: 0 10px 24px -12px rgba(43,32,10,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #fffdf8 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #fff8ea 0%, transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    min-height:100vh;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Kaisei Decol', 'Zen Kaku Gothic New', serif;}
+  a{color:inherit;}
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:22px 18px 64px;
+  }
+  header.top{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:6px 2px 20px;
+    border-bottom:2px solid var(--line);
+    margin-bottom:22px;
+  }
+  header.top .badge{
+    width:46px;height:46px;flex:0 0 auto;
+    border-radius:50%;
+    background:var(--navy);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+  }
+  header.top .titles{flex:1;min-width:0;}
+  header.top .kicker{
+    font-size:12px;letter-spacing:.04em;color:var(--soba);font-weight:700;
+  }
+  header.top h1{
+    margin:2px 0 0;font-size:19px;color:var(--navy-deep);font-weight:700;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+  }
+
+  /* ---- progress ---- */
+  .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .progress-track{flex:1;height:8px;border-radius:6px;background:var(--paper-deep);overflow:hidden;border:1px solid var(--line);}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold));transition:width .35s ease;}
+  .progress-label{font-size:13px;color:var(--ink-soft);white-space:nowrap;font-weight:700;}
+
+  /* ---- card ---- */
+  .card{
+    background:#fffefb;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px 24px;
+  }
+
+  /* ---- start screen ---- */
+  .start .hero-emoji{font-size:44px;line-height:1;margin-bottom:6px;}
+  .start h2{
+    font-family:'Kaisei Decol', serif;
+    font-size:28px;margin:0 0 10px;color:var(--navy-deep);
+  }
+  .start p{color:var(--ink-soft);margin:0 0 14px;font-size:15px;}
+  .start .facts{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0 22px;
+  }
+  .start .facts div{
+    background:var(--paper-deep);border-radius:12px;padding:12px 8px;text-align:center;
+  }
+  .start .facts div .num{display:block;font-family:'Kaisei Decol',serif;font-size:22px;color:var(--navy);font-weight:700;}
+  .start .facts div .lbl{display:block;font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .toggle-row{
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--paper-deep);border:1px solid var(--line);border-radius:14px;
+    padding:14px 14px;margin-bottom:20px;cursor:pointer;
+  }
+  .toggle-row input{margin-top:4px;width:18px;height:18px;accent-color:var(--gold);flex:0 0 auto;}
+  .toggle-row .t-title{font-weight:700;color:var(--navy-deep);font-size:14.5px;}
+  .toggle-row .t-sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+
+  button.primary{
+    width:100%;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:16px 18px;
+    font-size:16px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    letter-spacing:.02em;
+    box-shadow:0 8px 18px -8px rgba(31,56,100,.55);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  button.primary:active{transform:translateY(1px);box-shadow:0 4px 10px -6px rgba(31,56,100,.5);}
+  button.ghost{
+    width:100%;background:transparent;border:1.5px solid var(--line);color:var(--ink);
+    border-radius:14px;padding:13px 16px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+
+  /* ---- question screen ---- */
+  .q-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:12px;font-weight:700;padding:5px 11px;border-radius:99px;
+    border:1px solid var(--line);color:var(--soba);background:var(--paper-deep);
+  }
+  .pill.diff{color:var(--gold);border-color:var(--gold-soft);}
+  .pill.local{color:var(--ok);border-color:#bcdfc6;background:#eef8f0;}
+  .q-text{
+    font-size:18.5px;font-weight:700;color:var(--navy-deep);margin:0 0 22px;
+    line-height:1.75;
+  }
+  .choices{display:flex;flex-direction:column;gap:10px;margin-bottom:6px;}
+  .choice-btn{
+    text-align:left;
+    display:flex;align-items:center;gap:12px;
+    border:2px solid var(--line);
+    background:#fff;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:15.5px;
+    font-family:inherit;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .choice-btn .k{
+    flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+    background:var(--paper-deep);color:var(--navy);font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .choice-btn.selected{border-color:var(--navy);background:#eef2f8;}
+  .choice-btn.selected .k{background:var(--navy);color:#fff;}
+  .binary-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px;}
+  .binary-btn{
+    border:2px solid var(--line);background:#fff;border-radius:16px;
+    padding:26px 10px;text-align:center;cursor:pointer;font-family:inherit;
+  }
+  .binary-btn .sym{display:block;font-family:'Kaisei Decol',serif;font-size:38px;color:var(--navy);line-height:1;}
+  .binary-btn .lbl{display:block;margin-top:8px;font-size:13.5px;color:var(--ink-soft);font-weight:700;}
+  .binary-btn.selected{border-color:var(--navy);background:#eef2f8;}
+  .binary-btn.selected .sym{color:var(--navy-deep);}
+
+  .nav-row{display:flex;gap:10px;margin-top:22px;}
+  .nav-row button.primary{flex:1;}
+  .nav-row button.ghost{flex:0 0 96px;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* ---- result screen ---- */
+  .score-hero{text-align:center;padding:6px 0 6px;}
+  .score-hero .ring{
+    width:132px;height:132px;border-radius:50%;
+    margin:0 auto 14px;
+    background:conic-gradient(var(--gold) calc(var(--pct)*1%), var(--paper-deep) 0);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .score-hero .ring-inner{
+    width:104px;height:104px;border-radius:50%;background:#fffefb;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .score-hero .ring-inner .frac{font-family:'Kaisei Decol',serif;font-size:26px;color:var(--navy-deep);font-weight:700;}
+  .score-hero .ring-inner .frac small{font-size:14px;font-weight:500;color:var(--ink-soft);}
+  .score-hero .tier{font-size:19px;font-weight:700;color:var(--navy-deep);margin:4px 0 4px;}
+  .score-hero .tier-sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:6px;}
+
+  .review-item{
+    border:1px solid var(--line);border-radius:14px;padding:16px 16px;margin-top:14px;background:#fffefb;
+  }
+  .review-item .rh{display:flex;align-items:flex-start;gap:10px;}
+  .review-item .flag{
+    flex:0 0 auto;width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;
+  }
+  .review-item .flag.correct{background:var(--ok);}
+  .review-item .flag.wrong{background:var(--ng);}
+  .review-item .rq{font-weight:700;color:var(--navy-deep);font-size:15px;}
+  .review-item .rmeta{margin-top:8px;font-size:13.5px;}
+  .review-item .rmeta .row{margin-bottom:4px;}
+  .review-item .rmeta .lab{color:var(--ink-soft);}
+  .review-item .exp{
+    margin-top:8px;font-size:13.5px;color:var(--ink);
+    background:var(--paper-deep);border-radius:10px;padding:10px 12px;
+  }
+  .review-item .src{margin-top:6px;font-size:12px;color:var(--ink-soft);font-style:italic;}
+
+  .footer-note{
+    text-align:center;font-size:12px;color:var(--ink-soft);margin-top:28px;
+  }
+  .hidden{display:none !important;}
+  @media (max-width:380px){
+    .start .facts{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge">🚨</div>
+    <div class="titles">
+      <div class="kicker">荒井区そば祭り　防災コーナー</div>
+      <h1>防災チャレンジ｜あなたは災害時、生き残れる？</h1>
+    </div>
+  </header>
+
+  <div id="progressRow" class="progress-row hidden">
+    <div class="progress-track"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+    <div id="progressLabel" class="progress-label">0 / 15</div>
+  </div>
+
+  <!-- START -->
+  <section id="screen-start" class="card start">
+    <div class="hero-emoji">🍶🧻🔦</div>
+    <h2>発災後の「その3日間」、生き残れますか？</h2>
+    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。伊那市・小黒川ならではの問題も交えた全15問（＋地元の追加問題）に挑戦して、あなたの防災度をチェックしましょう。参加無料・答えると最後に採点と解説が出ます。</p>
+    <div class="facts">
+      <div><span class="num">15</span><span class="lbl">基本問題</span></div>
+      <div><span class="num">3</span><span class="lbl">出題形式</span></div>
+      <div><span class="num">★〜★★★</span><span class="lbl">難易度</span></div>
+    </div>
+    <label class="toggle-row" for="extraToggle">
+      <input type="checkbox" id="extraToggle" />
+      <div>
+        <div class="t-title">伊那市・小黒川の追加問題も出す（＋3問）</div>
+        <div class="t-sub">小黒川渓谷キャンプ場や伊那市防災ハンドブックにちなんだご当地問題です</div>
+      </div>
+    </label>
+    <button class="primary" id="btnStart">挑戦する</button>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="screen-question" class="card hidden">
+    <div class="q-meta">
+      <span class="pill" id="qType">○×</span>
+      <span class="pill diff" id="qDiff">★</span>
+      <span class="pill local hidden" id="qLocal">地元問題</span>
+    </div>
+    <p class="q-text" id="qText"></p>
+    <div id="binaryChoices" class="binary-row hidden">
+      <button class="binary-btn" data-val="○"><span class="sym">○</span><span class="lbl">適切・正しい</span></button>
+      <button class="binary-btn" data-val="×"><span class="sym">×</span><span class="lbl">不適切・誤り</span></button>
+    </div>
+    <div id="multiChoices" class="choices hidden"></div>
+    <div class="nav-row">
+      <button class="ghost" id="btnBack">戻る</button>
+      <button class="primary" id="btnNext" disabled>次へ</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="card hidden">
+    <div class="score-hero">
+      <div class="ring" id="scoreRing" style="--pct:0">
+        <div class="ring-inner">
+          <div class="frac"><span id="scoreNum">0</span><small id="scoreTotal">/15</small></div>
+        </div>
+      </div>
+      <div class="tier" id="tierText"></div>
+      <div class="tier-sub" id="tierSub"></div>
+      <button class="ghost" id="btnRetry">もう一度挑戦する</button>
+    </div>
+    <div id="reviewList"></div>
+  </section>
+
+  <p class="footer-note">出典：内閣府（防災担当）／消防庁／伊那市公式ホームページ　ほか<br>荒井区そば祭り　防災コーナー運営委員会</p>
+</div>
+
+<script>
+const MAIN_QUIZ = [
+  {id:1,type:"○×",diff:1,q:"私は、家族4人分の携帯トイレを備蓄しようと考え、「1人1日5回×4人×3日分」で計算し、60回分を用意した。この対応は適切か。",kind:"binary",answer:"○",
+   exp:"1日にトイレへ行く回数は1人5回が備蓄計算の基準。5回×4人×3日＝60回分となり、この計算方法は適切。自宅避難でも同じ考え方で必要量を見積もれる。",
+   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
+  {id:2,type:"○×",diff:2,q:"私は、地震のあと断水したが「少しくらいなら大丈夫だろう」と思い、バケツで水を汲んできて、いつも通りトイレに流して使った。この対応は適切か。",kind:"binary",answer:"×",
+   exp:"断水中は排水管や下水道が壊れている場合があり、無理に流すと汚水が逆流したり階下に漏れたりする恐れがある。使えるか分からないときは携帯トイレを使うのが安全。",
+   source:"神奈川県・高砂市「携帯トイレを備蓄しましょう」"},
+  {id:3,type:"○×",diff:2,q:"私は、地震で停電したあと家から避難する前に、忘れずにブレーカーを落としてから外に出た。この対応は適切か。",kind:"binary",answer:"○",
+   exp:"電気が復旧した瞬間に、壊れた電気製品やコードから出火する「通電火災」を防ぐため。阪神・淡路大震災では原因が分かった火災の約6割が電気関係だった。",
+   source:"消防庁・内閣府「大規模地震時の電気火災の発生抑制に関する検討会」"},
+  {id:4,type:"○×",diff:1,q:"私は、災害に備えて家族の飲料水を「1人1日3リットル×3日分」で計算し、備蓄した。この量の考え方は標準的か。",kind:"binary",answer:"○",
+   exp:"飲用と調理用を合わせた最低限の量。4人家族で3日分なら36リットルが目安になる。長期の断水に備えるなら1週間分が望ましい。",
+   source:"内閣府・農林水産省 家庭備蓄ガイド"},
+  {id:5,type:"○×",diff:2,q:"私は、大雨のときに「警戒レベル4」が発表されたが、「まだ高齢者だけが避難する段階だろう」と思い、そのまま自宅で様子を見た。この判断は適切か。",kind:"binary",answer:"×",
+   exp:"「高齢者等避難」は警戒レベル3。レベル4は「避難指示」で、危険な場所にいる人は全員が避難する必要がある。レベル5を待ってはいけない。",
+   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
+  {id:6,type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉私は、「小黒川渓谷キャンプ場は水洗トイレが整っているから、災害時もそのまま使えるだろう」と思い、自宅の携帯トイレは特に用意しなかった。この考え方は適切か。",kind:"binary",answer:"×",
+   exp:"水洗トイレは水道が生きていることが前提の設備。整った施設でも断水すればトイレが使えなくなるのは一般家庭と同じ。だからこそ携帯トイレの備えが大切。",
+   source:"施設情報（現地案内）／内閣府ガイドラインの考え方をもとに作成"},
+  {id:7,type:"○×",diff:2,q:"私は、浸水のおそれがあるという避難情報を受けて、指定避難所ではなく、高台にある友人の家に避難することにした。この行動は適切か。",kind:"binary",answer:"○",
+   exp:"避難とは指定避難所へ行くことだけではない。安全な場所であれば、親戚・知人宅や高い建物へ移ることも立派な立退き避難になる。",
+   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
+  {id:8,type:"4択",diff:2,q:"私は、携帯トイレを1週間分備蓄しようと考え、「1人あたり□回分」を目安に用意することにした。内閣府の考え方に基づくと、□に入る数として正しいのはどれか。",
+   kind:"choice",choices:["15回分","35回分","50回分","100回分"],answer:1,
+   exp:"1日5回×7日で35回分。4人家族なら140回分が目安になる。トイレは「なくなって初めて困る」代表格なので、多めの備えが安心。",
+   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
+  {id:9,type:"4択",diff:2,q:"私は、地震で停電したあと「すぐには火事にならないだろう」と思い、ブレーカーを上げたまま自宅を離れた。実際に、阪神・淡路大震災で原因が分かった建物火災のうち、電気に関係する火災（通電火災など）の割合はおよそどのくらいだったか。",
+   kind:"choice",choices:["約2割","約4割","約6割","約9割"],answer:2,
+   exp:"139件の火災のうち85件、約6割が電気関係だった。停電からの復旧時に、時間差で出火するケースが多く報告されている。",
+   source:"消防庁・内閣府「大規模地震時の電気火災の発生抑制に関する検討会」報告書"},
+  {id:10,type:"3択",diff:1,q:"町内会の防災訓練に参加した私は、「警戒レベルは全部でいくつあるのだろう」と気になり、資料で確認した。正しい段階数はどれか。",
+   kind:"choice",choices:["3段階","5段階","7段階"],answer:1,
+   exp:"レベル1〜5まであり、レベル3で「高齢者等避難」、レベル4で「全員避難」が呼びかけられる。レベル5は命の危険がある切迫した状況。",
+   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
+  {id:11,type:"3択",diff:1,q:"私は、家族の携帯トイレ備蓄量を計算するために、まず「1人が1日にトイレへ行く回数」を確認することにした。備蓄計算の基準とされる回数はどれか。",
+   kind:"choice",choices:["1〜2回","5回","10回以上"],answer:1,
+   exp:"個人差はあるが、備蓄の計算では1人1日5回を基準にするのが一般的。この数字に家族の人数と日数をかけて必要量を出す。",
+   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
+  {id:12,type:"3択",diff:1,local:true,q:"〈伊那・小黒川〉私は、自宅にある「伊那市防災ハンドブック」を手に取り、「これはいつ発行されたものだろう」と発行時期を確認した。最新版が発行された時期はどれか。",
+   kind:"choice",choices:["2023年12月","2024年12月","2025年12月"],answer:2,
+   exp:"伊那市はゼンリンとの共同事業で最新版を2025年12月に発行し、市内全世帯に配布した。地震対策や風水害、日頃の備え、避難所などがまとめられている。",
+   source:"伊那市公式ホームページ「伊那市防災ハンドブック」"},
+  {id:13,type:"状況判断",diff:3,q:"大雨で小黒川が増水し、私のいる地域に「警戒レベル4（避難指示）」が発表された。私は「レベル5が出たら動こう」と考え、そのまま自宅で様子を見ることにした。この判断は適切か。",
+   kind:"binary",answer:"×",
+   exp:"レベル4は「危険な場所にいる人は全員避難」の合図。レベル5を待たず、指定避難場所か安全な親戚・知人宅など、危険な場所の外へすぐ移ることが大切。",
+   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
+  {id:14,type:"状況判断",diff:2,q:"地震のあと停電・断水した。トイレに行きたくなった私は、「我慢できないほどではない」と思い、水が使えるようになるまで数時間我慢した。この対応は適切か。",
+   kind:"binary",answer:"×",
+   exp:"断水中や排水管損傷のおそれがあるときは、我慢せず携帯トイレ（便袋・凝固剤）を使うのが基本。我慢は健康被害につながるおそれがある。",
+   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
+  {id:15,type:"状況判断",diff:2,q:"避難先から自宅に戻ると電気が復旧していた。私は「やっと使える」とうれしくなり、家中の家電のプラグを一斉にコンセントへ差し込み、普段通りに使い始めた。この対応は適切か。",
+   kind:"binary",answer:"×",
+   exp:"通電火災は電気が復旧したあと、時間差で発生することが多い。焦げ臭いにおいやコードの損傷がないか確認しながら、家電を1つずつ確かめて使い始めることが大切。",
+   source:"消防庁「通電火災の防止」"},
+];
+
+const LOCAL_BONUS = [
+  {id:"追加1",type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉私は、回覧板で受け取った「伊那市防災ハンドブック」を見て、「これは伊那市が単独で作った資料だろう」と思った。この考えは正しいか。",
+   kind:"binary",answer:"×",
+   exp:"実際は伊那市と民間企業（株式会社ゼンリン）との共同事業でつくられ、市内事業者の協賛も得て、令和7年（2025年）12月に各世帯へ配布された。",
+   source:"伊那市公式ホームページ「伊那市防災ハンドブック」"},
+  {id:"追加2",type:"3択",diff:1,local:true,q:"〈伊那・小黒川〉私は小黒川渓谷キャンプ場へ車で向かう途中、「最寄りの高速道路インターチェンジはどこだろう」と考えた。正しいのはどれか。",
+   kind:"choice",choices:["伊那インターチェンジ","小黒川スマートインターチェンジ","駒ヶ根インターチェンジ"],answer:1,
+   exp:"中央自動車道・小黒川スマートICから車で約8分の場所にある、地元でもおなじみのキャンプ場。",
+   source:"キャンプ場公式・観光情報サイト"},
+  {id:"追加3",type:"○×",diff:2,local:true,q:"〈伊那・小黒川〉私は、「伊那市防災ハンドブック」を開いたが、「どうせ地震対策のことしか書いていないだろう」と思い、最初のページしか読まなかった。この思い込みは正しいか。",
+   kind:"binary",answer:"×",
+   exp:"実際は地震対策のほか、風水害・マイタイムライン、日頃の備え、避難所・避難場所など幅広い内容がまとめられている。",
+   source:"伊那市公式ホームページ（ハンドブック構成より）"},
+];
+
+let quiz = [];
+let current = 0;
+let answers = {}; // id -> value
+
+const el = (id) => document.getElementById(id);
+const screenStart = el('screen-start');
+const screenQuestion = el('screen-question');
+const screenResult = el('screen-result');
+const progressRow = el('progressRow');
+
+el('btnStart').addEventListener('click', () => {
+  const useExtra = el('extraToggle').checked;
+  quiz = useExtra ? MAIN_QUIZ.concat(LOCAL_BONUS) : MAIN_QUIZ.slice();
+  current = 0;
+  answers = {};
+  screenStart.classList.add('hidden');
+  screenResult.classList.add('hidden');
+  screenQuestion.classList.remove('hidden');
+  progressRow.classList.remove('hidden');
+  renderQuestion();
+});
+
+el('btnBack').addEventListener('click', () => {
+  if (current === 0) {
+    screenQuestion.classList.add('hidden');
+    progressRow.classList.add('hidden');
+    screenStart.classList.remove('hidden');
+    return;
+  }
+  current -= 1;
+  renderQuestion();
+});
+
+el('btnNext').addEventListener('click', () => {
+  if (current < quiz.length - 1) {
+    current += 1;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function stars(n){ return "★".repeat(n) + "☆".repeat(3-n); }
+
+function renderQuestion(){
+  const item = quiz[current];
+  el('qType').textContent = item.type;
+  el('qDiff').textContent = stars(item.diff);
+  el('qLocal').classList.toggle('hidden', !item.local);
+  el('qText').textContent = item.q;
+
+  const binaryBox = el('binaryChoices');
+  const multiBox = el('multiChoices');
+  const prev = answers[item.id];
+
+  if (item.kind === 'binary') {
+    binaryBox.classList.remove('hidden');
+    multiBox.classList.add('hidden');
+    multiBox.innerHTML = '';
+    [...binaryBox.querySelectorAll('.binary-btn')].forEach(btn => {
+      btn.classList.toggle('selected', prev === btn.dataset.val);
+      btn.onclick = () => {
+        answers[item.id] = btn.dataset.val;
+        renderQuestion();
+      };
+    });
+  } else {
+    binaryBox.classList.add('hidden');
+    multiBox.classList.remove('hidden');
+    multiBox.innerHTML = '';
+    const labels = ['a','b','c','d'];
+    item.choices.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn' + (prev === i ? ' selected' : '');
+      b.innerHTML = '<span class="k">' + labels[i] + '</span><span>' + c + '</span>';
+      b.onclick = () => {
+        answers[item.id] = i;
+        renderQuestion();
+      };
+      multiBox.appendChild(b);
+    });
+  }
+
+  el('btnNext').disabled = answers[item.id] === undefined;
+  el('btnNext').textContent = (current === quiz.length - 1) ? '採点する' : '次へ';
+  el('btnBack').textContent = (current === 0) ? 'トップへ' : '戻る';
+
+  const pct = Math.round(((current) / quiz.length) * 100);
+  el('progressFill').style.width = pct + '%';
+  el('progressLabel').textContent = (current + 1) + ' / ' + quiz.length;
+}
+
+function tierFor(pct){
+  if (pct === 100) return ["満点！立派な防災マスターです", "その調子で、ご家庭の備えも今日見直してみましょう"];
+  if (pct >= 80) return ["ばっちり！かなりの備え上手です", "あと少し。あやふやだった問題を見直してみましょう"];
+  if (pct >= 50) return ["もう一歩！基本は押さえられています", "トイレ・水・電気の3つを中心に、今日をきっかけに備えを"];
+  return ["これからが本番！一緒に備えましょう", "難しく考えなくて大丈夫。まずは携帯トイレと水から始めてみましょう"];
+}
+
+function showResult(){
+  screenQuestion.classList.add('hidden');
+  progressRow.classList.add('hidden');
+  screenResult.classList.remove('hidden');
+
+  let correctCount = 0;
+  const rows = quiz.map(item => {
+    const given = answers[item.id];
+    let isCorrect, yourText, correctText;
+    if (item.kind === 'binary') {
+      isCorrect = given === item.answer;
+      yourText = given;
+      correctText = item.answer;
+    } else {
+      isCorrect = given === item.answer;
+      yourText = item.choices[given];
+      correctText = item.choices[item.answer];
+    }
+    if (isCorrect) correctCount += 1;
+    return {item, isCorrect, yourText, correctText};
+  });
+
+  const total = quiz.length;
+  const pct = Math.round((correctCount / total) * 100);
+  el('scoreRing').style.setProperty('--pct', pct);
+  el('scoreNum').textContent = correctCount;
+  el('scoreTotal').textContent = '/' + total;
+  const [tier, sub] = tierFor(pct);
+  el('tierText').textContent = tier;
+  el('tierSub').textContent = sub;
+
+  const list = el('reviewList');
+  list.innerHTML = '';
+  rows.forEach(({item, isCorrect, yourText, correctText}, idx) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rh">
+        <div class="flag ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓' : '✗'}</div>
+        <div class="rq">Q${idx+1}［${item.type}／難易度 ${stars(item.diff)}］${item.local ? '【地元問題】' : ''}<br>${item.q}</div>
+      </div>
+      <div class="rmeta">
+        <div class="row"><span class="lab">あなたの回答：</span>${yourText ?? '（未回答）'}</div>
+        <div class="row"><span class="lab">正解：</span><strong>${correctText}</strong></div>
+      </div>
+      <div class="exp">${item.exp}</div>
+      <div class="src">出典：${item.source}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+el('btnRetry').addEventListener('click', () => {
+  screenResult.classList.add('hidden');
+  screenStart.classList.remove('hidden');
+});
+</script>
+</body>
+</html>
