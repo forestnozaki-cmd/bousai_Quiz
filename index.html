@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>防災チャレンジ｜あなたは災害時、生き残れる？</title>
+<title>防災チャレンジ｜災害時あなたはどうする？</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -61,10 +61,10 @@
   }
   header.top .titles{flex:1;min-width:0;}
   header.top .kicker{
-    font-size:12px;letter-spacing:.04em;color:var(--soba);font-weight:700;
+    font-size:13.5px;letter-spacing:.01em;color:var(--soba);font-weight:500;margin-top:3px;
   }
   header.top h1{
-    margin:2px 0 0;font-size:19px;color:var(--navy-deep);font-weight:700;
+    margin:0;font-size:19px;color:var(--navy-deep);font-weight:700;
     font-family:'Zen Kaku Gothic New', sans-serif;
   }
 
@@ -179,6 +179,8 @@
 
   /* ---- result screen ---- */
   .score-hero{text-align:center;padding:6px 0 6px;}
+  .score-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px;}
+  .score-row .score-label{font-family:'Kaisei Decol',serif;font-size:17px;font-weight:700;color:var(--soba);}
   .score-hero .ring{
     width:132px;height:132px;border-radius:50%;
     margin:0 auto 14px;
@@ -193,6 +195,17 @@
   .score-hero .ring-inner .frac small{font-size:14px;font-weight:500;color:var(--ink-soft);}
   .score-hero .tier{font-size:19px;font-weight:700;color:var(--navy-deep);margin:4px 0 4px;}
   .score-hero .tier-sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:6px;}
+  .submit-hint{font-size:12px;color:var(--ink-soft);margin:8px 0 14px;}
+
+  .staff-panel{
+    position:fixed;left:12px;bottom:12px;z-index:50;
+    background:#fffefb;border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;box-shadow:var(--shadow);max-width:260px;
+  }
+  .staff-panel .staff-title{font-weight:700;color:var(--navy-deep);font-size:13.5px;margin-bottom:4px;}
+  .staff-panel .staff-sub{font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+  .staff-panel button{margin-bottom:8px;padding:9px 12px;font-size:13px;}
+  .staff-panel button:last-child{margin-bottom:0;}
 
   .review-item{
     border:1px solid var(--line);border-radius:14px;padding:16px 16px;margin-top:14px;background:#fffefb;
@@ -228,8 +241,8 @@
   <header class="top">
     <div class="badge">🚨</div>
     <div class="titles">
-      <div class="kicker">荒井区そば祭り　防災コーナー</div>
-      <h1>防災チャレンジ｜あなたは災害時、生き残れる？</h1>
+      <h1>荒井区防災チャレンジクイズ</h1>
+      <div class="kicker">クイズに答えて景品をもらおう、防災コーナーへお立ち寄り下さい。</div>
     </div>
   </header>
 
@@ -240,8 +253,41 @@
 
   <!-- START -->
   <section id="screen-start" class="card start">
-    <div class="hero-emoji">🍶🧻🔦</div>
-    <h2>発災後の「その3日間」、生き残れますか？</h2>
+    <div class="hero-emoji"><span class="icon-bottle" aria-hidden="true"><svg viewBox="0 0 36 36" width="1em" height="1em" style="vertical-align:-0.18em;">
+      <defs>
+        <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#E9C77E"/>
+          <stop offset="1" stop-color="#9C6B1E"/>
+        </linearGradient>
+        <linearGradient id="neckGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#4C6690"/>
+          <stop offset="1" stop-color="#243A5E"/>
+        </linearGradient>
+        <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FBFEFF"/>
+          <stop offset="1" stop-color="#CFE3EC"/>
+        </linearGradient>
+        <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#8FCFEF"/>
+          <stop offset="1" stop-color="#2C7CAE"/>
+        </linearGradient>
+        <filter id="bottleShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0.8" stdDeviation="0.8" flood-color="#1F3864" flood-opacity="0.28"/>
+        </filter>
+      </defs>
+      <ellipse cx="18" cy="33.6" rx="8.6" ry="1.5" fill="#1F3864" opacity="0.16"/>
+      <g filter="url(#bottleShadow)">
+        <rect x="14.5" y="1" width="7" height="4.2" rx="1.3" fill="url(#capGrad)" stroke="#7a5417" stroke-width="0.4"/>
+        <rect x="15.3" y="5.2" width="5.4" height="5" fill="url(#neckGrad)"/>
+        <path d="M15.3,10.2 L10,15 L10,29 Q10,32 13,32 L23,32 Q26,32 26,29 L26,15 L20.7,10.2 Z"
+              fill="url(#bodyGrad)" stroke="#8CA6BE" stroke-width="0.6"/>
+        <path d="M10,20.5 Q18,18 26,20.5 L26,29 Q26,32 23,32 L13,32 Q10,32 10,29 Z" fill="url(#waterGrad)"/>
+        <path d="M10,20.5 Q18,18 26,20.5" fill="none" stroke="#D6F1FC" stroke-width="0.6" opacity="0.85"/>
+        <ellipse cx="15.5" cy="21.4" rx="2.6" ry="0.7" fill="#EAF8FF" opacity="0.55"/>
+        <path d="M12,13 L12,29.5" stroke="#FFFFFF" stroke-width="1.1" opacity="0.5" stroke-linecap="round"/>
+      </g>
+    </svg></span>🧻🔦</div>
+    <h2>発災後の「3日間」あなたはどうする？</h2>
     <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。伊那市・小黒川ならではの問題も交えた全15問（＋地元の追加問題）に挑戦して、あなたの防災度をチェックしましょう。参加無料・答えると最後に採点と解説が出ます。</p>
     <div class="facts">
       <div><span class="num">15</span><span class="lbl">基本問題</span></div>
@@ -249,7 +295,7 @@
       <div><span class="num">★〜★★★</span><span class="lbl">難易度</span></div>
     </div>
     <label class="toggle-row" for="extraToggle">
-      <input type="checkbox" id="extraToggle" />
+      <input type="checkbox" id="extraToggle" checked />
       <div>
         <div class="t-title">伊那市・小黒川の追加問題も出す（＋3問）</div>
         <div class="t-sub">小黒川渓谷キャンプ場や伊那市防災ハンドブックにちなんだご当地問題です</div>
@@ -280,14 +326,18 @@
   <!-- RESULT -->
   <section id="screen-result" class="card hidden">
     <div class="score-hero">
-      <div class="ring" id="scoreRing" style="--pct:0">
-        <div class="ring-inner">
-          <div class="frac"><span id="scoreNum">0</span><small id="scoreTotal">/15</small></div>
+      <div class="score-row">
+        <div class="score-label">正答率</div>
+        <div class="ring" id="scoreRing" style="--pct:0">
+          <div class="ring-inner">
+            <div class="frac"><span id="scoreNum">0</span><small id="scoreTotal">/15</small></div>
+          </div>
         </div>
       </div>
       <div class="tier" id="tierText"></div>
       <div class="tier-sub" id="tierSub"></div>
-      <button class="ghost" id="btnRetry">もう一度挑戦する</button>
+      <button class="primary" id="btnSubmitForm">回答結果を送信して終了</button>
+      <div class="submit-hint" id="submitHint">新しいタブが開きます。内容を確認して「送信」を押してください</div>
     </div>
     <div id="reviewList"></div>
   </section>
@@ -295,90 +345,175 @@
   <p class="footer-note">出典：内閣府（防災担当）／消防庁／伊那市公式ホームページ　ほか<br>荒井区そば祭り　防災コーナー運営委員会</p>
 </div>
 
+<div id="staffPanel" class="staff-panel hidden">
+  <div class="staff-title">スタッフ用：集計データ</div>
+  <div class="staff-sub" id="staffCount">端末内の控え：0件</div>
+  <button class="ghost" id="btnExportCsv">CSVでダウンロード</button>
+  <button class="ghost" id="btnClearBackup">端末内の控えを消去</button>
+</div>
+
 <script>
 const MAIN_QUIZ = [
-  {id:1,type:"○×",diff:1,q:"私は、家族4人分の携帯トイレを備蓄しようと考え、「1人1日5回×4人×3日分」で計算し、60回分を用意した。この対応は適切か。",kind:"binary",answer:"○",
-   exp:"1日にトイレへ行く回数は1人5回が備蓄計算の基準。5回×4人×3日＝60回分となり、この計算方法は適切。自宅避難でも同じ考え方で必要量を見積もれる。",
-   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
-  {id:2,type:"○×",diff:2,q:"私は、地震のあと断水したが「少しくらいなら大丈夫だろう」と思い、バケツで水を汲んできて、いつも通りトイレに流して使った。この対応は適切か。",kind:"binary",answer:"×",
-   exp:"断水中は排水管や下水道が壊れている場合があり、無理に流すと汚水が逆流したり階下に漏れたりする恐れがある。使えるか分からないときは携帯トイレを使うのが安全。",
-   source:"神奈川県・高砂市「携帯トイレを備蓄しましょう」"},
-  {id:3,type:"○×",diff:2,q:"私は、地震で停電したあと家から避難する前に、忘れずにブレーカーを落としてから外に出た。この対応は適切か。",kind:"binary",answer:"○",
-   exp:"電気が復旧した瞬間に、壊れた電気製品やコードから出火する「通電火災」を防ぐため。阪神・淡路大震災では原因が分かった火災の約6割が電気関係だった。",
-   source:"消防庁・内閣府「大規模地震時の電気火災の発生抑制に関する検討会」"},
-  {id:4,type:"○×",diff:1,q:"私は、災害に備えて家族の飲料水を「1人1日3リットル×3日分」で計算し、備蓄した。この量の考え方は標準的か。",kind:"binary",answer:"○",
-   exp:"飲用と調理用を合わせた最低限の量。4人家族で3日分なら36リットルが目安になる。長期の断水に備えるなら1週間分が望ましい。",
-   source:"内閣府・農林水産省 家庭備蓄ガイド"},
-  {id:5,type:"○×",diff:2,q:"私は、大雨のときに「警戒レベル4」が発表されたが、「まだ高齢者だけが避難する段階だろう」と思い、そのまま自宅で様子を見た。この判断は適切か。",kind:"binary",answer:"×",
-   exp:"「高齢者等避難」は警戒レベル3。レベル4は「避難指示」で、危険な場所にいる人は全員が避難する必要がある。レベル5を待ってはいけない。",
-   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
-  {id:6,type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉私は、「小黒川渓谷キャンプ場は水洗トイレが整っているから、災害時もそのまま使えるだろう」と思い、自宅の携帯トイレは特に用意しなかった。この考え方は適切か。",kind:"binary",answer:"×",
-   exp:"水洗トイレは水道が生きていることが前提の設備。整った施設でも断水すればトイレが使えなくなるのは一般家庭と同じ。だからこそ携帯トイレの備えが大切。",
-   source:"施設情報（現地案内）／内閣府ガイドラインの考え方をもとに作成"},
-  {id:7,type:"○×",diff:2,q:"私は、浸水のおそれがあるという避難情報を受けて、指定避難所ではなく、高台にある友人の家に避難することにした。この行動は適切か。",kind:"binary",answer:"○",
-   exp:"避難とは指定避難所へ行くことだけではない。安全な場所であれば、親戚・知人宅や高い建物へ移ることも立派な立退き避難になる。",
-   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
-  {id:8,type:"4択",diff:2,q:"私は、携帯トイレを1週間分備蓄しようと考え、「1人あたり□回分」を目安に用意することにした。内閣府の考え方に基づくと、□に入る数として正しいのはどれか。",
-   kind:"choice",choices:["15回分","35回分","50回分","100回分"],answer:1,
-   exp:"1日5回×7日で35回分。4人家族なら140回分が目安になる。トイレは「なくなって初めて困る」代表格なので、多めの備えが安心。",
-   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
-  {id:9,type:"4択",diff:2,q:"私は、地震で停電したあと「すぐには火事にならないだろう」と思い、ブレーカーを上げたまま自宅を離れた。実際に、阪神・淡路大震災で原因が分かった建物火災のうち、電気に関係する火災（通電火災など）の割合はおよそどのくらいだったか。",
-   kind:"choice",choices:["約2割","約4割","約6割","約9割"],answer:2,
-   exp:"139件の火災のうち85件、約6割が電気関係だった。停電からの復旧時に、時間差で出火するケースが多く報告されている。",
-   source:"消防庁・内閣府「大規模地震時の電気火災の発生抑制に関する検討会」報告書"},
-  {id:10,type:"3択",diff:1,q:"町内会の防災訓練に参加した私は、「警戒レベルは全部でいくつあるのだろう」と気になり、資料で確認した。正しい段階数はどれか。",
-   kind:"choice",choices:["3段階","5段階","7段階"],answer:1,
-   exp:"レベル1〜5まであり、レベル3で「高齢者等避難」、レベル4で「全員避難」が呼びかけられる。レベル5は命の危険がある切迫した状況。",
-   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
-  {id:11,type:"3択",diff:1,q:"私は、家族の携帯トイレ備蓄量を計算するために、まず「1人が1日にトイレへ行く回数」を確認することにした。備蓄計算の基準とされる回数はどれか。",
-   kind:"choice",choices:["1〜2回","5回","10回以上"],answer:1,
-   exp:"個人差はあるが、備蓄の計算では1人1日5回を基準にするのが一般的。この数字に家族の人数と日数をかけて必要量を出す。",
-   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
-  {id:12,type:"3択",diff:1,local:true,q:"〈伊那・小黒川〉私は、自宅にある「伊那市防災ハンドブック」を手に取り、「これはいつ発行されたものだろう」と発行時期を確認した。最新版が発行された時期はどれか。",
-   kind:"choice",choices:["2023年12月","2024年12月","2025年12月"],answer:2,
-   exp:"伊那市はゼンリンとの共同事業で最新版を2025年12月に発行し、市内全世帯に配布した。地震対策や風水害、日頃の備え、避難所などがまとめられている。",
-   source:"伊那市公式ホームページ「伊那市防災ハンドブック」"},
-  {id:13,type:"状況判断",diff:3,q:"大雨で小黒川が増水し、私のいる地域に「警戒レベル4（避難指示）」が発表された。私は「レベル5が出たら動こう」と考え、そのまま自宅で様子を見ることにした。この判断は適切か。",
-   kind:"binary",answer:"×",
-   exp:"レベル4は「危険な場所にいる人は全員避難」の合図。レベル5を待たず、指定避難場所か安全な親戚・知人宅など、危険な場所の外へすぐ移ることが大切。",
-   source:"内閣府（防災担当）「避難情報に関するガイドライン」"},
-  {id:14,type:"状況判断",diff:2,q:"地震のあと停電・断水した。トイレに行きたくなった私は、「我慢できないほどではない」と思い、水が使えるようになるまで数時間我慢した。この対応は適切か。",
-   kind:"binary",answer:"×",
-   exp:"断水中や排水管損傷のおそれがあるときは、我慢せず携帯トイレ（便袋・凝固剤）を使うのが基本。我慢は健康被害につながるおそれがある。",
-   source:"内閣府「避難所におけるトイレの確保・管理ガイドライン」"},
-  {id:15,type:"状況判断",diff:2,q:"避難先から自宅に戻ると電気が復旧していた。私は「やっと使える」とうれしくなり、家中の家電のプラグを一斉にコンセントへ差し込み、普段通りに使い始めた。この対応は適切か。",
-   kind:"binary",answer:"×",
-   exp:"通電火災は電気が復旧したあと、時間差で発生することが多い。焦げ臭いにおいやコードの損傷がないか確認しながら、家電を1つずつ確かめて使い始めることが大切。",
-   source:"消防庁「通電火災の防止」"},
+  {id:1,type:"○×",diff:1,q:"大雨で近くの川が怖い！指定の学校へ向かう道路が冠水しそう。避難指示も出たので、途中の高台にある頑丈な友人宅へ避難することにした。",kind:"binary",answer:"○",
+   exp:"危険な道を避けて高台の友人宅など安全な場所へ逃げる「自主避難・分散避難」は正しい判断です。",
+   source:"内閣府『避難行動判定フロー』・国土交通省"},
+  {id:2,type:"○×",diff:1,q:"大きな地震の後、自宅のトイレは見た目も無事。水もたまっていたので、１回だけレバーを回して流した。",kind:"binary",answer:"×",
+   exp:"見た目は無事でも下水管が壊れている恐れがあります。汚水の逆流を防ぐため、安全確認まで水は流さず非常用トイレを使いましょう。",
+   source:"国土交通省『大規模地震発生時における下水道の被害に備えた対応』・内閣府"},
+  {id:3,type:"○×",diff:2,q:"地震で停電発生！避難所へ逃げるとき、停電していたのでブレーカーを切らずに家を出た。",kind:"binary",answer:"×",
+   exp:"電気復旧時に倒れたヒーターなどから火が出る「通電火災」を防ぐため、避難時は必ずブレーカーを落とします。",
+   source:"総務省消防庁『地震火災を防ぐポイント』"},
+  {id:4,type:"○×",diff:1,q:"災害時の水は、飲むための「飲料水」だけでなく、手洗いや掃除に使う「生活用水」も別で備えるべきである。",kind:"binary",answer:"○",
+   exp:"命を守る飲用水とは別に、衛生を保つ「生活用水」も不可欠です。お風呂に水を張っておく等の備えが役立ちます。",
+   source:"農林水産省『緊急時に備えた食品ストックガイド』・内閣府"},
+  {id:5,type:"○×",diff:2,q:"袋でお米やおかずを煮る「パッククッキング」。家にある普通の透明ポリ袋であれば使っても大丈夫。",kind:"binary",answer:"×",
+   exp:"普通のポリ袋は熱で溶けます！必ず「高密度ポリエチレン（耐熱100度以上）」と書かれた袋を使ってください。",
+   source:"農林水産省・東京都『パッククッキングの基礎知識』"},
+  {id:6,type:"○×",diff:1,q:"大きな災害時、救助や支援物資が本格的に届くまで時間がかかるため、家庭で「最低2日分」の備蓄が必要である。",kind:"binary",answer:"×",
+   exp:"発災後72時間（3日間）は救助が最優先され支援物資が遅れます。各家庭で最低3日分の水・食料・トイレを用意しましょう。",
+   source:"内閣府『家庭での備蓄ポータル』"},
+  {id:7,type:"○×",diff:2,q:"大雨で「警戒レベル4・避難指示」が出たが、まだレベル5があるのでレベル5になってから避難してもよい。",kind:"binary",answer:"×",
+   exp:"レベル4で危険な場所にいる人は全員避難です！レベル5は既に命が危険な状態なので、レベル4までに避難を完了させます。",
+   source:"気象庁・内閣府『防災気象情報と警戒レベル』"},
+  {id:8,type:"選択式",diff:1,q:"大人が1日に命を維持するために必要な「飲む水」の量は、1人あたりどれくらい？",
+   kind:"choice",choices:["約2L","約3L","約5L"],answer:1,
+   exp:"人間が1日に必要な飲料水は1人約3L。3日分なら1人あたり9L（2Lボトル4.5本）が目安です。",
+   source:"農林水産省『災害時に備えた食品ストックガイド』"},
+  {id:9,type:"選択式",diff:2,q:"ご夫婦2人暮らしの家庭で、災害時の「3日間」を乗り切るには非常用トイレが最低何個必要？",
+   kind:"choice",choices:["約24個","約30個","約48個"],answer:1,
+   exp:"1人1日平均5回×2人×3日＝30個必要です。水が止まると一番困るのがトイレです！",
+   source:"内閣府『避難所におけるトイレの確保・管理ガイドライン』"},
+  {id:10,type:"選択式",diff:1,q:"停電で部屋が真っ暗！懐中電灯の上に「あるもの」を置くと、部屋全体を照らすランタンになる。それは何？",
+   kind:"choice",choices:["空のガラスコップ","水が入ったペットボトル","アルミホイル"],answer:1,
+   exp:"水を入れたペットボトルを乗せると光が乱反射し、部屋全体がパッと明るくなります。",
+   source:"警視庁警備部災害対策課"},
+  {id:11,type:"選択式",diff:1,q:"避難所などで役立つ「新聞紙スリッパ」。作る一番のメリットは何？",
+   kind:"choice",choices:["洗って何度も使える","足を保護し温かい","意外と防水になる"],answer:1,
+   exp:"折るだけでガラス片などから足を保護し、紙の空気層で足元を冷えから守ってくれます。",
+   source:"東京消防庁『新聞紙を活用した防災グッズ』"},
+  {id:12,type:"選択式",diff:2,q:"強い揺れが来たとき、真っ先に取るべき基本行動（シェイクアウト行動）はどれ？",
+   kind:"choice",choices:["走る・叫ぶ・ドアを開ける","姿勢を低く・頭を守る・動かない","ブレーカー切る・荷物まとめる・外へ出る"],answer:1,
+   exp:"まずは体勢を低くし机の下などで頭を守り、揺れが収まるまで動かないのが鉄則です。",
+   source:"気象庁『シェイクアウト行動』"},
+  {id:13,type:"状況判断",diff:3,q:"大きな地震が収まり家族がトイレに行きたがっている。水道は止まっていないが、どうする？",
+   kind:"choice",choices:["水道が使えれば、水で流す","便器に袋をセットし「非常用トイレ」として使わせる","バケツの水で流す"],answer:1,
+   exp:"見えない管が破損している恐れがあるため、安全確認まで水は流さず非常用トイレを使いましょう。",
+   source:"国土交通省『下水道BCP作成マニュアル』"},
+  {id:14,type:"状況判断",diff:3,q:"夜間に大雨が降り、家の前はすでに膝上まで冠水！避難指示が出たが、避難所までは徒歩3分。どうする？",
+   kind:"choice",choices:["冠水した道路を歩いて避難所へ向かう","自宅の2階など安全な高い場所へ移動する（垂直避難）","水が引くまで玄関で待つ"],answer:1,
+   exp:"夜間の冠水道路はマンホール転落などの危険が極めて高いため、自宅の2階へ逃げる垂直避難が安全です。",
+   source:"国土交通省・気象庁『大雨・台風時の避難行動』"},
+  {id:15,type:"状況判断",diff:2,q:"地震で地域全体が停電！在宅避難を続けるとき、冷蔵庫の中身はどう扱う？",
+   kind:"choice",choices:["頻繁に開けて中身を整理し非常食から食べる","扉の開閉を最小限にし傷みやすい生鮮食品から食べる","傷むのですぐ全部捨てる"],answer:1,
+   exp:"開閉を控えれば冷気が保たれます。傷む前の生鮮食品から消費し、貴重な非常食を温存しましょう。",
+   source:"農林水産省『災害時に役立つ食品ストックガイド』"},
 ];
 
 const LOCAL_BONUS = [
-  {id:"追加1",type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉私は、回覧板で受け取った「伊那市防災ハンドブック」を見て、「これは伊那市が単独で作った資料だろう」と思った。この考えは正しいか。",
-   kind:"binary",answer:"×",
-   exp:"実際は伊那市と民間企業（株式会社ゼンリン）との共同事業でつくられ、市内事業者の協賛も得て、令和7年（2025年）12月に各世帯へ配布された。",
-   source:"伊那市公式ホームページ「伊那市防災ハンドブック」"},
-  {id:"追加2",type:"3択",diff:1,local:true,q:"〈伊那・小黒川〉私は小黒川渓谷キャンプ場へ車で向かう途中、「最寄りの高速道路インターチェンジはどこだろう」と考えた。正しいのはどれか。",
-   kind:"choice",choices:["伊那インターチェンジ","小黒川スマートインターチェンジ","駒ヶ根インターチェンジ"],answer:1,
-   exp:"中央自動車道・小黒川スマートICから車で約8分の場所にある、地元でもおなじみのキャンプ場。",
-   source:"キャンプ場公式・観光情報サイト"},
-  {id:"追加3",type:"○×",diff:2,local:true,q:"〈伊那・小黒川〉私は、「伊那市防災ハンドブック」を開いたが、「どうせ地震対策のことしか書いていないだろう」と思い、最初のページしか読まなかった。この思い込みは正しいか。",
-   kind:"binary",answer:"×",
-   exp:"実際は地震対策のほか、風水害・マイタイムライン、日頃の備え、避難所・避難場所など幅広い内容がまとめられている。",
-   source:"伊那市公式ホームページ（ハンドブック構成より）"},
+  {id:"追加1",type:"選択式",diff:2,local:true,q:"〈伊那・小黒川〉会場の目の前を流れる「小黒川」。大雨のとき、山の土砂や岩が水と混ざり一気に押し寄せる現象は？",
+   kind:"choice",choices:["地滑り","土石流","崖崩れ"],answer:1,
+   exp:"急峻な小黒川周辺は土石流のリスクがあります。川の濁りや異音を感じたらすぐ高台へ逃げましょう。",
+   source:"伊那市『伊那市防災ハンドブック』"},
+  {id:"追加2",type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉伊那市配布の『伊那市防災ハンドブック』には、避難場所だけでなく家の危険度がわかる「ハザードマップ」も載っている。",
+   kind:"binary",answer:"○",
+   exp:"最新の伊那市防災ハンドブックには全域のハザードマップが掲載されています。普段から自宅周辺を確認しておきましょう。",
+   source:"伊那市『伊那市防災ハンドブック』"},
+  {id:"追加3",type:"選択式",diff:2,local:true,q:"〈伊那・小黒川〉長野県『信州防災手帳』で推奨されている「マイ・タイムライン」とは何？",
+   kind:"choice",choices:["災害時のSNS投稿計画","大雨のとき自分や家族が「いつ・どこへ避難するか」をまとめた個人避難計画","防災訓練の年間カレンダー"],answer:1,
+   exp:"いざという時に慌てず避難できるよう、家族ごとの避難タイミングと行動を事前にまとめた計画です。",
+   source:"長野県『信州防災手帳』"},
 ];
 
-let quiz = [];
-let current = 0;
-let answers = {}; // id -> value
+// ▼▼▼ Microsoft Forms連携設定 ▼▼▼
+const MSFORM = {
+  // フォームの回答ページURL（?id=... を含む部分。パラメータはこのあとに &で追加します）
+  baseUrl: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAANAAVd1YlVUOERCOUdURjlPVlI4OEtFT0ZJWkFJSlVaSS4u",
+  // 各項目に対応するパラメータ名
+  params: {
+    score:  "r442f7aa72ad444ff82a77319f25cbe71",
+    total:  "re7d03df900ce420d9b90e84647285bb2",
+    rate:   "r00487fada9e947c7847ccf81af4650da",
+    extra:  "r8e585e890f6147378d4cffbe2a367be7",
+    detail: "r9a210aad730e48e7b229a0752fa86719",
+  },
+};
+const FORM_CONFIGURED = !MSFORM.baseUrl.includes("YOUR_FORM_ID_HERE");
+
+function buildFormUrl(score, total, pct, usedExtra, detailStr){
+  const p = MSFORM.params;
+  const qs = new URLSearchParams();
+  qs.set(p.score, String(score));
+  qs.set(p.total, String(total));
+  qs.set(p.rate, pct + "%");
+  qs.set(p.extra, usedExtra ? "はい" : "いいえ");
+  qs.set(p.detail, detailStr);
+  return MSFORM.baseUrl + "&" + qs.toString();
+}
+
+// ---- 端末内の控え（ネット環境が悪い場合の保険）----
+const BACKUP_KEY = "bosai_quiz_backup_v1";
+function saveLocalBackup(record){
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem(BACKUP_KEY) || "[]"); } catch(e) { list = []; }
+  list.push(record);
+  if (list.length > 500) list = list.slice(list.length - 500);
+  try { localStorage.setItem(BACKUP_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function loadLocalBackup(){
+  try { return JSON.parse(localStorage.getItem(BACKUP_KEY) || "[]"); } catch(e) { return []; }
+}
+function csvEscape(v){
+  const s = String(v ?? "");
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function exportBackupCsv(){
+  const rows = loadLocalBackup();
+  const header = ["日時","得点","満点","正答率","追加問題","各問正誤"];
+  const lines = [header.join(",")];
+  rows.forEach(r => {
+    lines.push([r.ts, r.score, r.total, r.pct + "%", r.usedExtra ? "はい" : "いいえ", r.detail].map(csvEscape).join(","));
+  });
+  const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "防災チャレンジ_端末内控え_" + new Date().toISOString().slice(0,10) + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ---- スタッフ用パネル（URLに ?staff=1 を付けて開くと表示）----
+function initStaffPanel(){
+  if (new URLSearchParams(location.search).get("staff") === "1") {
+    const panel = el("staffPanel");
+    panel.classList.remove("hidden");
+    el("staffCount").textContent = "端末内の控え：" + loadLocalBackup().length + "件";
+    el("btnExportCsv").addEventListener("click", exportBackupCsv);
+    el("btnClearBackup").addEventListener("click", () => {
+      if (confirm("端末内の控えをすべて消去します。よろしいですか？")) {
+        localStorage.removeItem(BACKUP_KEY);
+        el("staffCount").textContent = "端末内の控え：0件";
+      }
+    });
+  }
+}
+
+let usedExtra = false;
+let lastFormUrl = "";
 
 const el = (id) => document.getElementById(id);
 const screenStart = el('screen-start');
 const screenQuestion = el('screen-question');
 const screenResult = el('screen-result');
 const progressRow = el('progressRow');
+initStaffPanel();
+
 
 el('btnStart').addEventListener('click', () => {
   const useExtra = el('extraToggle').checked;
+  usedExtra = useExtra;
   quiz = useExtra ? MAIN_QUIZ.concat(LOCAL_BONUS) : MAIN_QUIZ.slice();
   current = 0;
   answers = {};
@@ -497,6 +632,27 @@ function showResult(){
   el('tierText').textContent = tier;
   el('tierSub').textContent = sub;
 
+  const detailStr = rows.map(r => r.isCorrect ? "○" : "×").join(",");
+  const record = {
+    ts: new Date().toISOString(),
+    score: correctCount, total, pct,
+    usedExtra, detail: detailStr,
+  };
+  saveLocalBackup(record);
+
+  const btnSubmit = el('btnSubmitForm');
+  const hint = el('submitHint');
+  if (FORM_CONFIGURED) {
+    lastFormUrl = buildFormUrl(correctCount, total, pct, usedExtra, detailStr);
+    btnSubmit.classList.remove('hidden');
+    hint.classList.remove('hidden');
+    hint.textContent = '新しいタブが開きます。内容を確認して「送信」を押してください';
+  } else {
+    // Microsoft Formsが未設定の場合は送信ボタンを表示しない（端末内には控えを保存済み）
+    btnSubmit.classList.add('hidden');
+    hint.classList.add('hidden');
+  }
+
   const list = el('reviewList');
   list.innerHTML = '';
   rows.forEach(({item, isCorrect, yourText, correctText}, idx) => {
@@ -518,9 +674,8 @@ function showResult(){
   });
 }
 
-el('btnRetry').addEventListener('click', () => {
-  screenResult.classList.add('hidden');
-  screenStart.classList.remove('hidden');
+el('btnSubmitForm').addEventListener('click', () => {
+  if (lastFormUrl) window.open(lastFormUrl, '_blank', 'noopener');
 });
 </script>
 </body>
