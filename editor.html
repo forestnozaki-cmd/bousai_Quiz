@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>防災チャレンジ｜問題編集ツール（スタッフ用）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3864; --navy-deep:#132444; --gold:#B7862C; --gold-soft:#E4C179;
+    --soba:#7B5233; --paper:#FAF3E6; --paper-deep:#F1E6D2; --ink:#2A2420;
+    --ink-soft:#6b6156; --ok:#2E7D46; --ng:#B23B2E; --line:#DDCBA8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 80px;}
+  h1{font-size:20px;color:var(--navy-deep);margin:0 0 4px;}
+  .lead{color:var(--ink-soft);font-size:13.5px;margin:0 0 20px;}
+  .toolbar{
+    position:sticky;top:0;z-index:10;background:var(--paper);
+    display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;border-bottom:2px solid var(--line);margin-bottom:20px;
+  }
+  .toolbar button{
+    font-family:inherit;font-size:13.5px;font-weight:700;border-radius:10px;padding:9px 14px;cursor:pointer;
+  }
+  .btn-primary{background:var(--navy);color:#fff;border:none;}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-danger{background:#fff;color:var(--ng);border:1.5px solid #e3b6ae;}
+  .status{font-size:12.5px;color:var(--ink-soft);padding:9px 4px;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:18px;}
+  .tab-btn{
+    font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 16px;border-radius:99px;
+    border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+  }
+  .tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  .section-title{font-size:15px;font-weight:700;color:var(--navy-deep);margin:20px 0 10px;}
+  .count-badge{font-size:12px;color:var(--soba);font-weight:700;margin-left:6px;}
+
+  .q-card{
+    background:#fffefb;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;
+  }
+  .q-card .q-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+  .q-card .q-num{font-weight:700;color:var(--navy-deep);font-size:14px;}
+  .q-card .q-preview{font-size:13.5px;color:var(--ink);margin-top:2px;}
+  .q-card .q-actions{display:flex;gap:6px;flex:0 0 auto;}
+  .q-card .q-actions button{
+    font-size:12px;font-weight:700;border-radius:8px;padding:6px 10px;cursor:pointer;font-family:inherit;
+  }
+
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--soba);margin-bottom:4px;}
+  .field input[type="text"], .field textarea, .field select{
+    width:100%;font-family:inherit;font-size:13.5px;padding:8px 10px;border:1.5px solid var(--line);
+    border-radius:8px;background:#fff;color:var(--ink);
+  }
+  .field textarea{min-height:56px;resize:vertical;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .choice-edit-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+  .choice-edit-row input{flex:1;}
+  .choice-edit-row button{flex:0 0 auto;font-size:11px;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;}
+
+  .add-card{
+    border:2px dashed var(--line);border-radius:14px;padding:16px;text-align:center;
+    color:var(--ink-soft);font-weight:700;font-size:13.5px;cursor:pointer;background:transparent;width:100%;
+    font-family:inherit;
+  }
+  .add-card:hover{border-color:var(--gold);color:var(--soba);}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>防災チャレンジ｜問題編集ツール（スタッフ用）</h1>
+  <p class="lead">クイズ本編・地域限定の追加問題・アンケートを編集し、更新した quiz-data.json をダウンロードできます。来場者には案内しないでください。</p>
+
+  <div class="toolbar">
+    <button class="btn-ghost" id="btnLoadDefault">同じフォルダの quiz-data.json を読み込む</button>
+    <label class="btn-ghost" style="display:inline-block;">
+      ファイルを選択して読み込む
+      <input type="file" id="fileInput" accept="application/json" class="hidden">
+    </label>
+    <button class="btn-primary" id="btnDownload">JSONをダウンロード</button>
+    <span class="status" id="statusText"></span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="main">クイズ本編</button>
+    <button class="tab-btn" data-tab="local">地域限定の追加問題</button>
+    <button class="tab-btn" data-tab="survey">アンケート</button>
+  </div>
+
+  <div class="tab-panel active" id="panel-main">
+    <div class="section-title">クイズ本編<span class="count-badge" id="mainCount"></span></div>
+    <div id="mainList"></div>
+    <button class="add-card" id="btnAddMain">＋ 問題を追加</button>
+  </div>
+
+  <div class="tab-panel" id="panel-local">
+    <div class="section-title">地域限定の追加問題<span class="count-badge" id="localCount"></span></div>
+    <div id="localList"></div>
+    <button class="add-card" id="btnAddLocal">＋ 追加問題を追加</button>
+  </div>
+
+  <div class="tab-panel" id="panel-survey">
+    <div class="section-title">アンケート<span class="count-badge" id="surveyCount"></span></div>
+    <p class="lead">選択式のみです。質問を追加・削除した場合は、Microsoft Forms側にも質問欄の追加・削除と、index.html内の MSFORM.surveyParams の書き換えが必要です。</p>
+    <div id="surveyList"></div>
+    <button class="add-card" id="btnAddSurvey">＋ アンケート項目を追加</button>
+  </div>
+</div>
+
+<script>
+let DATA = { mainQuiz: [], localBonus: [], survey: [] };
+
+const $ = (id) => document.getElementById(id);
+const setStatus = (msg) => { $('statusText').textContent = msg; };
+
+// ---- タブ切り替え ----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---- 読み込み ----
+function loadFromObject(obj){
+  DATA = {
+    mainQuiz: obj.mainQuiz || [],
+    localBonus: obj.localBonus || [],
+    survey: obj.survey || [],
+  };
+  renderAll();
+}
+
+$('btnLoadDefault').addEventListener('click', () => {
+  setStatus('読み込み中…');
+  fetch('quiz-data.json', { cache: 'no-store' })
+    .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+    .then(obj => { loadFromObject(obj); setStatus('quiz-data.json を読み込みました'); })
+    .catch(err => { setStatus('読み込み失敗：同じフォルダに quiz-data.json があるか確認してください（' + err.message + '）'); });
+});
+
+$('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const obj = JSON.parse(reader.result);
+      loadFromObject(obj);
+      setStatus('「' + file.name + '」を読み込みました');
+    } catch (err) {
+      setStatus('JSONの読み込みに失敗しました：' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+// 起動時に自動で同じフォルダのquiz-data.jsonを読み込んでみる
+$('btnLoadDefault').click();
+
+// ---- ダウンロード ----
+$('btnDownload').addEventListener('click', () => {
+  const json = JSON.stringify(DATA, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quiz-data.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setStatus('quiz-data.json をダウンロードしました。Vercelの同じファイルと差し替えてください');
+});
+
+// ---- 共通：プレビュー用テキスト ----
+function preview(q){ return q.length > 46 ? q.slice(0,46) + '…' : q; }
+
+// ---- クイズ問題（本編・追加共通）のレンダリング ----
+function renderQuizList(listEl, arr, isLocal){
+  listEl.innerHTML = '';
+  arr.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-head">
+        <div>
+          <div class="q-num">Q${idx+1}　[${item.type || (item.kind==='binary'?'○×':'選択式')}／★${item.diff||1}]</div>
+          <div class="q-preview">${preview(item.q || '')}</div>
+        </div>
+        <div class="q-actions">
+          <button class="btn-ghost" data-act="edit">編集</button>
+          <button class="btn-danger" data-act="del">削除</button>
+        </div>
+      </div>
+      <div class="edit-form hidden"></div>
+    `;
+    const form = card.querySelector('.edit-form');
+    card.querySelector('[data-act="edit"]').addEventListener('click', () => {
+      const isOpen = !form.classList.contains('hidden');
+      if (isOpen) { form.classList.add('hidden'); return; }
+      form.innerHTML = buildQuizForm(item, isLocal);
+      form.classList.remove('hidden');
+      wireQuizForm(form, item, () => renderQuizList(listEl, arr, isLocal));
+    });
+    card.querySelector('[data-act="del"]').addEventListener('click', () => {
+      if (confirm('この問題を削除します。よろしいですか？')) {
+        arr.splice(idx, 1);
+        renderQuizList(listEl, arr, isLocal);
+        renderCounts();
+      }
+    });
+    listEl.appendChild(card);
+  });
+}
+
+function buildQuizForm(item, isLocal){
+  const kind = item.kind || 'binary';
+  const choicesHtml = (item.choices || ['','','']).map((c, i) =>
+    `<div class="choice-edit-row">
+       <input type="text" class="f-choice" data-idx="${i}" value="${escapeAttr(c)}">
+       <button type="button" class="f-choice-del" data-idx="${i}">削除</button>
+     </div>`
+  ).join('');
+  return `
+    <div class="field"><label>問題文</label><textarea class="f-q">${escapeHtml(item.q||'')}</textarea></div>
+    <div class="row3">
+      <div class="field"><label>種別ラベル（表示用）</label><input type="text" class="f-type" value="${escapeAttr(item.type||'')}" placeholder="○×／選択式／状況判断など"></div>
+      <div class="field"><label>難易度（1〜3）</label>
+        <select class="f-diff">
+          <option value="1" ${item.diff===1?'selected':''}>★☆☆</option>
+          <option value="2" ${item.diff===2?'selected':''}>★★☆</option>
+          <option value="3" ${item.diff===3?'selected':''}>★★★</option>
+        </select>
+      </div>
+      <div class="field"><label>回答形式</label>
+        <select class="f-kind">
+          <option value="binary" ${kind==='binary'?'selected':''}>○×（2択）</option>
+          <option value="choice" ${kind==='choice'?'selected':''}>選択式（3〜4択）</option>
+        </select>
+      </div>
+    </div>
+    <div class="binary-answer field ${kind==='choice'?'hidden':''}">
+      <label>正解</label>
+      <select class="f-binary-answer">
+        <option value="○" ${item.answer==='○'?'selected':''}>○</option>
+        <option value="×" ${item.answer==='×'?'selected':''}>×</option>
+      </select>
+    </div>
+    <div class="choice-answer ${kind==='binary'?'hidden':''}">
+      <div class="field"><label>選択肢（上から a, b, c, d…）</label>
+        <div class="choice-list">${choicesHtml}</div>
+        <button type="button" class="btn-ghost f-choice-add" style="margin-top:4px;">＋ 選択肢を追加</button>
+      </div>
+      <div class="field"><label>正解の選択肢</label>
+        <select class="f-choice-answer">
+          ${(item.choices||[]).map((c,i)=>`<option value="${i}" ${item.answer===i?'selected':''}>${labelOf(i)}．${escapeHtml(c)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>解説（20秒程度で話せる分量）</label><textarea class="f-exp">${escapeHtml(item.exp||'')}</textarea></div>
+    <div class="field"><label>出典</label><input type="text" class="f-source" value="${escapeAttr(item.source||'')}"></div>
+    <button type="button" class="btn-primary f-save">この内容で保存</button>
+  `;
+}
+
+function labelOf(i){ return ['a','b','c','d','e'][i] || String(i+1); }
+
+function wireQuizForm(form, item, onSaved){
+  const kindSelect = form.querySelector('.f-kind');
+  const binaryBox = form.querySelector('.binary-answer');
+  const choiceBox = form.querySelector('.choice-answer');
+  kindSelect.addEventListener('change', () => {
+    if (kindSelect.value === 'binary') { binaryBox.classList.remove('hidden'); choiceBox.classList.add('hidden'); }
+    else { binaryBox.classList.add('hidden'); choiceBox.classList.remove('hidden'); }
+  });
+
+  function refreshChoiceAnswerOptions(){
+    const inputs = [...form.querySelectorAll('.f-choice')];
+    const sel = form.querySelector('.f-choice-answer');
+    const prevVal = sel.value;
+    sel.innerHTML = inputs.map((inp,i) => `<option value="${i}">${labelOf(i)}．${escapeHtml(inp.value)}</option>`).join('');
+    if (prevVal && Number(prevVal) < inputs.length) sel.value = prevVal;
+  }
+  form.querySelectorAll('.f-choice').forEach(inp => inp.addEventListener('input', refreshChoiceAnswerOptions));
+
+  form.querySelector('.f-choice-add').addEventListener('click', () => {
+    const list = form.querySelector('.choice-list');
+    const idx = list.querySelectorAll('.choice-edit-row').length;
+    const row = document.createElement('div');
+    row.className = 'choice-edit-row';
+    row.innerHTML = `<input type="text" class="f-choice" data-idx="${idx}" value=""><button type="button" class="f-choice-del" data-idx="${idx}">削除</button>`;
+    list.appendChild(row);
+    row.querySelector('.f-choice').addEventListener('input', refreshChoiceAnswerOptions);
+    row.querySelector('.f-choice-del').addEventListener('click', () => { row.remove(); refreshChoiceAnswerOptions(); });
+    refreshChoiceAnswerOptions();
+  });
+  form.querySelectorAll('.f-choice-del').forEach(btn => {
+    btn.addEventListener('click', () => { btn.closest('.choice-edit-row').remove(); refreshChoiceAnswerOptions(); });
+  });
+
+  form.querySelector('.f-save').addEventListener('click', () => {
+    item.q = form.querySelector('.f-q').value.trim();
+    item.type = form.querySelector('.f-type').value.trim();
+    item.diff = Number(form.querySelector('.f-diff').value);
+    item.kind = kindSelect.value;
+    if (item.kind === 'binary') {
+      item.answer = form.querySelector('.f-binary-answer').value;
+      delete item.choices;
+    } else {
+      const choices = [...form.querySelectorAll('.f-choice')].map(i => i.value.trim()).filter(v => v !== '');
+      item.choices = choices;
+      item.answer = Number(form.querySelector('.f-choice-answer').value);
+    }
+    item.exp = form.querySelector('.f-exp').value.trim();
+    item.source = form.querySelector('.f-source').value.trim();
+    onSaved();
+    renderCounts();
+    setStatus('保存しました（画面上のみ。反映するには最後に「JSONをダウンロード」してください）');
+  });
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+// ---- 新規追加 ----
+function nextMainId(){
+  const ids = DATA.mainQuiz.map(q => Number(q.id)).filter(n => !isNaN(n));
+  return ids.length ? Math.max(...ids) + 1 : 1;
+}
+function nextLocalId(){
+  const nums = DATA.localBonus.map(q => {
+    const m = String(q.id).match(/(\d+)$/);
+    return m ? Number(m[1]) : 0;
+  });
+  return '追加' + (nums.length ? Math.max(...nums) + 1 : 1);
+}
+function nextSurveyId(){
+  const nums = DATA.survey.map(s => {
+    const m = String(s.id).match(/^s(\d+)$/);
+    return m ? Number(m[1]) : 0;
+  });
+  return 's' + (nums.length ? Math.max(...nums) + 1 : 1);
+}
+
+$('btnAddMain').addEventListener('click', () => {
+  DATA.mainQuiz.push({ id: nextMainId(), type: '○×', diff: 1, kind: 'binary', q: '', answer: '○', exp: '', source: '' });
+  renderAll();
+});
+$('btnAddLocal').addEventListener('click', () => {
+  DATA.localBonus.push({ id: nextLocalId(), type: '○×', diff: 1, local: true, kind: 'binary', q: '', answer: '○', exp: '', source: '' });
+  renderAll();
+});
+
+// ---- アンケート ----
+function renderSurveyList(){
+  const listEl = $('surveyList');
+  listEl.innerHTML = '';
+  DATA.survey.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-head">
+        <div>
+          <div class="q-num">S${idx+1}　（id: ${item.id}）</div>
+          <div class="q-preview">${preview(item.q||'')}</div>
+        </div>
+        <div class="q-actions">
+          <button class="btn-ghost" data-act="edit">編集</button>
+          <button class="btn-danger" data-act="del">削除</button>
+        </div>
+      </div>
+      <div class="edit-form hidden"></div>
+    `;
+    const form = card.querySelector('.edit-form');
+    card.querySelector('[data-act="edit"]').addEventListener('click', () => {
+      const isOpen = !form.classList.contains('hidden');
+      if (isOpen) { form.classList.add('hidden'); return; }
+      const choicesHtml = (item.choices||['','']).map((c,i) =>
+        `<div class="choice-edit-row"><input type="text" class="f-choice" value="${escapeAttr(c)}"><button type="button" class="f-choice-del">削除</button></div>`
+      ).join('');
+      form.innerHTML = `
+        <div class="field"><label>質問文</label><textarea class="f-q">${escapeHtml(item.q||'')}</textarea></div>
+        <div class="field"><label>選択肢</label>
+          <div class="choice-list">${choicesHtml}</div>
+          <button type="button" class="btn-ghost f-choice-add" style="margin-top:4px;">＋ 選択肢を追加</button>
+        </div>
+        <button type="button" class="btn-primary f-save">この内容で保存</button>
+      `;
+      form.classList.remove('hidden');
+      form.querySelectorAll('.f-choice-del').forEach(btn => btn.addEventListener('click', () => btn.closest('.choice-edit-row').remove()));
+      form.querySelector('.f-choice-add').addEventListener('click', () => {
+        const row = document.createElement('div');
+        row.className = 'choice-edit-row';
+        row.innerHTML = `<input type="text" class="f-choice" value=""><button type="button" class="f-choice-del">削除</button>`;
+        form.querySelector('.choice-list').appendChild(row);
+        row.querySelector('.f-choice-del').addEventListener('click', () => row.remove());
+      });
+      form.querySelector('.f-save').addEventListener('click', () => {
+        item.q = form.querySelector('.f-q').value.trim();
+        item.choices = [...form.querySelectorAll('.f-choice')].map(i => i.value.trim()).filter(v => v !== '');
+        renderSurveyList();
+        renderCounts();
+        setStatus('保存しました（画面上のみ。反映するには最後に「JSONをダウンロード」してください）');
+      });
+    });
+    card.querySelector('[data-act="del"]').addEventListener('click', () => {
+      if (confirm('このアンケート項目を削除します。よろしいですか？\n（Microsoft Forms側の対応する質問欄も忘れずに整理してください）')) {
+        DATA.survey.splice(idx, 1);
+        renderSurveyList();
+        renderCounts();
+      }
+    });
+    listEl.appendChild(card);
+  });
+}
+$('btnAddSurvey').addEventListener('click', () => {
+  DATA.survey.push({ id: nextSurveyId(), q: '', choices: ['', ''] });
+  renderSurveyList();
+  renderCounts();
+  setStatus('アンケート項目を追加しました。忘れずに index.html の MSFORM.surveyParams にも追記してください');
+});
+
+function renderCounts(){
+  $('mainCount').textContent = '（' + DATA.mainQuiz.length + '問）';
+  $('localCount').textContent = '（' + DATA.localBonus.length + '問）';
+  $('surveyCount').textContent = '（' + DATA.survey.length + '問）';
+}
+
+function renderAll(){
+  renderQuizList($('mainList'), DATA.mainQuiz, false);
+  renderQuizList($('localList'), DATA.localBonus, true);
+  renderSurveyList();
+  renderCounts();
+}
+</script>
+</body>
+</html>

@@ -172,6 +172,10 @@
   .binary-btn.selected{border-color:var(--navy);background:#eef2f8;}
   .binary-btn.selected .sym{color:var(--navy-deep);}
 
+  .survey-q{margin-bottom:22px;}
+  .survey-q .sq-text{font-weight:700;color:var(--navy-deep);font-size:15.5px;margin-bottom:10px;}
+  .survey-q .choices{margin-bottom:0;}
+
   .nav-row{display:flex;gap:10px;margin-top:22px;}
   .nav-row button.primary{flex:1;}
   .nav-row button.ghost{flex:0 0 96px;}
@@ -302,7 +306,7 @@
         <div class="t-sub">小黒川渓谷キャンプ場や伊那市防災ハンドブックにちなんだご当地問題です</div>
       </div>
     </label>
-    <button class="primary" id="btnStart">挑戦する</button>
+    <button class="primary" id="btnStart" disabled>読み込み中…</button>
   </section>
 
   <!-- QUESTION -->
@@ -321,6 +325,16 @@
     <div class="nav-row">
       <button class="ghost" id="btnBack">戻る</button>
       <button class="primary" id="btnNext" disabled>次へ</button>
+    </div>
+  </section>
+
+  <!-- SURVEY -->
+  <section id="screen-survey" class="card hidden">
+    <div class="q-meta"><span class="pill">アンケート</span></div>
+    <p class="q-text" style="margin-bottom:6px;">最後に、いくつか感想を聞かせてください。</p>
+    <div id="surveyList"></div>
+    <div class="nav-row">
+      <button class="primary" id="btnSurveyNext" disabled style="flex:1;">結果を見る</button>
     </div>
   </section>
 
@@ -356,76 +370,9 @@
 </div>
 
 <script>
-const MAIN_QUIZ = [
-  {id:1,type:"○×",diff:1,q:"大雨で近くの川が怖い！指定の学校へ向かう道路が冠水しそう。避難指示も出たので、途中の高台にある頑丈な友人宅へ避難することにした。",kind:"binary",answer:"○",
-   exp:"危険な道を避けて高台の友人宅など安全な場所へ逃げる「自主避難・分散避難」は正しい判断です。",
-   source:"内閣府『避難行動判定フロー』・国土交通省"},
-  {id:2,type:"○×",diff:1,q:"大きな地震の後、自宅のトイレは見た目も無事。水もたまっていたので、１回だけレバーを回して流した。",kind:"binary",answer:"×",
-   exp:"見た目は無事でも下水管が壊れている恐れがあります。汚水の逆流を防ぐため、安全確認まで水は流さず非常用トイレを使いましょう。",
-   source:"国土交通省『大規模地震発生時における下水道の被害に備えた対応』・内閣府"},
-  {id:3,type:"○×",diff:2,q:"地震で停電発生！避難所へ逃げるとき、停電していたのでブレーカーを切らずに家を出た。",kind:"binary",answer:"×",
-   exp:"電気復旧時に倒れたヒーターなどから火が出る「通電火災」を防ぐため、避難時は必ずブレーカーを落とします。",
-   source:"総務省消防庁『地震火災を防ぐポイント』"},
-  {id:4,type:"○×",diff:1,q:"災害時の水は、飲むための「飲料水」だけでなく、手洗いや掃除に使う「生活用水」も別で備えるべきである。",kind:"binary",answer:"○",
-   exp:"命を守る飲用水とは別に、衛生を保つ「生活用水」も不可欠です。お風呂に水を張っておく等の備えが役立ちます。",
-   source:"農林水産省『緊急時に備えた食品ストックガイド』・内閣府"},
-  {id:5,type:"○×",diff:2,q:"袋でお米やおかずを煮る「パッククッキング」。家にある普通の透明ポリ袋であれば使っても大丈夫。",kind:"binary",answer:"×",
-   exp:"普通のポリ袋は熱で溶けます！必ず「高密度ポリエチレン（耐熱100度以上）」と書かれた袋を使ってください。",
-   source:"農林水産省・東京都『パッククッキングの基礎知識』"},
-  {id:6,type:"○×",diff:1,q:"大きな災害時、救助や支援物資が本格的に届くまで時間がかかるため、家庭で「最低2日分」の備蓄が必要である。",kind:"binary",answer:"×",
-   exp:"発災後72時間（3日間）は救助が最優先され支援物資が遅れます。各家庭で最低3日分の水・食料・トイレを用意しましょう。",
-   source:"内閣府『家庭での備蓄ポータル』"},
-  {id:7,type:"○×",diff:2,q:"大雨で「警戒レベル4・避難指示」が出たが、まだレベル5があるのでレベル5になってから避難してもよい。",kind:"binary",answer:"×",
-   exp:"レベル4で危険な場所にいる人は全員避難です！レベル5は既に命が危険な状態なので、レベル4までに避難を完了させます。",
-   source:"気象庁・内閣府『防災気象情報と警戒レベル』"},
-  {id:8,type:"選択式",diff:1,q:"大人が1日に命を維持するために必要な「飲む水」の量は、1人あたりどれくらい？",
-   kind:"choice",choices:["約2L","約3L","約5L"],answer:1,
-   exp:"人間が1日に必要な飲料水は1人約3L。3日分なら1人あたり9L（2Lボトル4.5本）が目安です。",
-   source:"農林水産省『災害時に備えた食品ストックガイド』"},
-  {id:9,type:"選択式",diff:2,q:"ご夫婦2人暮らしの家庭で、災害時の「3日間」を乗り切るには非常用トイレが最低何個必要？",
-   kind:"choice",choices:["約24個","約30個","約48個"],answer:1,
-   exp:"1人1日平均5回×2人×3日＝30個必要です。水が止まると一番困るのがトイレです！",
-   source:"内閣府『避難所におけるトイレの確保・管理ガイドライン』"},
-  {id:10,type:"選択式",diff:1,q:"停電で部屋が真っ暗！懐中電灯の上に「あるもの」を置くと、部屋全体を照らすランタンになる。それは何？",
-   kind:"choice",choices:["空のガラスコップ","水が入ったペットボトル","アルミホイル"],answer:1,
-   exp:"水を入れたペットボトルを乗せると光が乱反射し、部屋全体がパッと明るくなります。",
-   source:"警視庁警備部災害対策課"},
-  {id:11,type:"選択式",diff:1,q:"避難所などで役立つ「新聞紙スリッパ」。作る一番のメリットは何？",
-   kind:"choice",choices:["洗って何度も使える","足を保護し温かい","意外と防水になる"],answer:1,
-   exp:"折るだけでガラス片などから足を保護し、紙の空気層で足元を冷えから守ってくれます。",
-   source:"東京消防庁『新聞紙を活用した防災グッズ』"},
-  {id:12,type:"選択式",diff:2,q:"強い揺れが来たとき、真っ先に取るべき基本行動（シェイクアウト行動）はどれ？",
-   kind:"choice",choices:["走る・叫ぶ・ドアを開ける","姿勢を低く・頭を守る・動かない","ブレーカー切る・荷物まとめる・外へ出る"],answer:1,
-   exp:"まずは体勢を低くし机の下などで頭を守り、揺れが収まるまで動かないのが鉄則です。",
-   source:"気象庁『シェイクアウト行動』"},
-  {id:13,type:"状況判断",diff:3,q:"大きな地震が収まり家族がトイレに行きたがっている。水道は止まっていないが、どうする？",
-   kind:"choice",choices:["水道が使えれば、水で流す","便器に袋をセットし「非常用トイレ」として使わせる","バケツの水で流す"],answer:1,
-   exp:"見えない管が破損している恐れがあるため、安全確認まで水は流さず非常用トイレを使いましょう。",
-   source:"国土交通省『下水道BCP作成マニュアル』"},
-  {id:14,type:"状況判断",diff:3,q:"夜間に大雨が降り、家の前はすでに膝上まで冠水！避難指示が出たが、避難所までは徒歩3分。どうする？",
-   kind:"choice",choices:["冠水した道路を歩いて避難所へ向かう","自宅の2階など安全な高い場所へ移動する（垂直避難）","水が引くまで玄関で待つ"],answer:1,
-   exp:"夜間の冠水道路はマンホール転落などの危険が極めて高いため、自宅の2階へ逃げる垂直避難が安全です。",
-   source:"国土交通省・気象庁『大雨・台風時の避難行動』"},
-  {id:15,type:"状況判断",diff:2,q:"地震で地域全体が停電！在宅避難を続けるとき、冷蔵庫の中身はどう扱う？",
-   kind:"choice",choices:["頻繁に開けて中身を整理し非常食から食べる","扉の開閉を最小限にし傷みやすい生鮮食品から食べる","傷むのですぐ全部捨てる"],answer:1,
-   exp:"開閉を控えれば冷気が保たれます。傷む前の生鮮食品から消費し、貴重な非常食を温存しましょう。",
-   source:"農林水産省『災害時に役立つ食品ストックガイド』"},
-];
-
-const LOCAL_BONUS = [
-  {id:"追加1",type:"選択式",diff:2,local:true,q:"〈伊那・小黒川〉会場の目の前を流れる「小黒川」。大雨のとき、山の土砂や岩が水と混ざり一気に押し寄せる現象は？",
-   kind:"choice",choices:["地滑り","土石流","崖崩れ"],answer:1,
-   exp:"急峻な小黒川周辺は土石流のリスクがあります。川の濁りや異音を感じたらすぐ高台へ逃げましょう。",
-   source:"伊那市『伊那市防災ハンドブック』"},
-  {id:"追加2",type:"○×",diff:1,local:true,q:"〈伊那・小黒川〉伊那市配布の『伊那市防災ハンドブック』には、避難場所だけでなく家の危険度がわかる「ハザードマップ」も載っている。",
-   kind:"binary",answer:"○",
-   exp:"最新の伊那市防災ハンドブックには全域のハザードマップが掲載されています。普段から自宅周辺を確認しておきましょう。",
-   source:"伊那市『伊那市防災ハンドブック』"},
-  {id:"追加3",type:"選択式",diff:2,local:true,q:"〈伊那・小黒川〉長野県『信州防災手帳』で推奨されている「マイ・タイムライン」とは何？",
-   kind:"choice",choices:["災害時のSNS投稿計画","大雨のとき自分や家族が「いつ・どこへ避難するか」をまとめた個人避難計画","防災訓練の年間カレンダー"],answer:1,
-   exp:"いざという時に慌てず避難できるよう、家族ごとの避難タイミングと行動を事前にまとめた計画です。",
-   source:"長野県『信州防災手帳』"},
-];
+let MAIN_QUIZ = [];
+let LOCAL_BONUS = [];
+let SURVEY = [];
 
 // ▼▼▼ Microsoft Forms連携設定 ▼▼▼
 const MSFORM = {
@@ -439,10 +386,19 @@ const MSFORM = {
     extra:  "r8e585e890f6147378d4cffbe2a367be7",
     detail: "r9a210aad730e48e7b229a0752fa86719",
   },
+  // アンケートの各質問に対応するパラメータ名（quiz-data.json の survey[].id をキーにする）
+  // アンケートの質問を追加・削除した場合は、Forms側にも質問を追加し、ここに対応するパラメータ名を追記してください
+  surveyParams: {
+    s1: "rc0bd62924eb447febd86b6df223409b6", // 防災地図
+    s2: "r8a4f3dab43ec490da11416d0f3ec919c", // 自宅耐震化
+    s3: "rcd7257e5b5de47beb86890e4bedac678", // 非常持ち出し
+    s4: "r4dd024c8a3f242388f3d2189285eff59", // 避難先
+    s5: "r8a797f200a684508b27e27dfdaf1bc3d", // 年齢と世帯
+  },
 };
 const FORM_CONFIGURED = !MSFORM.baseUrl.includes("YOUR_FORM_ID_HERE");
 
-function buildFormUrl(score, total, pct, usedExtra, detailStr){
+function buildFormUrl(score, total, pct, usedExtra, detailStr, surveyAnswers){
   const p = MSFORM.params;
   const qs = new URLSearchParams();
   qs.set(p.score, String(score));
@@ -450,6 +406,10 @@ function buildFormUrl(score, total, pct, usedExtra, detailStr){
   qs.set(p.rate, pct + "%");
   qs.set(p.extra, usedExtra ? "はい" : "いいえ");
   qs.set(p.detail, detailStr);
+  Object.keys(surveyAnswers || {}).forEach(sid => {
+    const paramName = MSFORM.surveyParams[sid];
+    if (paramName) qs.set(paramName, surveyAnswers[sid]);
+  });
   return MSFORM.baseUrl + "&" + qs.toString();
 }
 
@@ -471,10 +431,11 @@ function csvEscape(v){
 }
 function exportBackupCsv(){
   const rows = loadLocalBackup();
-  const header = ["日時","得点","満点","正答率","追加問題","各問正誤"];
+  const header = ["日時","得点","満点","正答率","追加問題","各問正誤","アンケート"];
   const lines = [header.join(",")];
   rows.forEach(r => {
-    lines.push([r.ts, r.score, r.total, r.pct + "%", r.usedExtra ? "はい" : "いいえ", r.detail].map(csvEscape).join(","));
+    const surveyStr = r.survey ? Object.entries(r.survey).map(([k,v]) => k + ":" + v).join(" / ") : "";
+    lines.push([r.ts, r.score, r.total, r.pct + "%", r.usedExtra ? "はい" : "いいえ", r.detail, surveyStr].map(csvEscape).join(","));
   });
   const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -505,13 +466,30 @@ function initStaffPanel(){
 
 let usedExtra = false;
 let lastFormUrl = "";
+let surveyAnswers = {};
 
 const el = (id) => document.getElementById(id);
 const screenStart = el('screen-start');
 const screenQuestion = el('screen-question');
+const screenSurvey = el('screen-survey');
 const screenResult = el('screen-result');
 const progressRow = el('progressRow');
 initStaffPanel();
+
+// ---- クイズデータの読み込み（quiz-data.json を index.html と同じ場所に置いてください）----
+fetch('quiz-data.json', { cache: 'no-store' })
+  .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+  .then(data => {
+    MAIN_QUIZ = data.mainQuiz || [];
+    LOCAL_BONUS = data.localBonus || [];
+    SURVEY = data.survey || [];
+    el('btnStart').disabled = false;
+    el('btnStart').textContent = '挑戦する';
+  })
+  .catch(err => {
+    el('btnStart').textContent = '問題の読み込みに失敗しました';
+    console.error('quiz-data.json の読み込みに失敗しました。index.htmlと同じフォルダに置かれているか確認してください。', err);
+  });
 
 
 el('btnStart').addEventListener('click', () => {
@@ -520,8 +498,10 @@ el('btnStart').addEventListener('click', () => {
   quiz = useExtra ? MAIN_QUIZ.concat(LOCAL_BONUS) : MAIN_QUIZ.slice();
   current = 0;
   answers = {};
+  surveyAnswers = {};
   screenStart.classList.add('hidden');
   screenResult.classList.add('hidden');
+  screenSurvey.classList.add('hidden');
   screenQuestion.classList.remove('hidden');
   progressRow.classList.remove('hidden');
   renderQuestion();
@@ -542,9 +522,45 @@ el('btnNext').addEventListener('click', () => {
   if (current < quiz.length - 1) {
     current += 1;
     renderQuestion();
+  } else if (SURVEY.length > 0) {
+    showSurvey();
   } else {
     showResult();
   }
+});
+
+function showSurvey(){
+  screenQuestion.classList.add('hidden');
+  progressRow.classList.add('hidden');
+  screenSurvey.classList.remove('hidden');
+
+  const list = el('surveyList');
+  list.innerHTML = '';
+  SURVEY.forEach(sq => {
+    const block = document.createElement('div');
+    block.className = 'survey-q';
+    const labels = ['a','b','c','d'];
+    const choicesHtml = sq.choices.map((c, i) =>
+      `<button class="choice-btn" data-sid="${sq.id}" data-idx="${i}"><span class="k">${labels[i]}</span><span>${c}</span></button>`
+    ).join('');
+    block.innerHTML = `<div class="sq-text">${sq.q}</div><div class="choices">${choicesHtml}</div>`;
+    list.appendChild(block);
+  });
+
+  list.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sid = btn.dataset.sid;
+      const idx = Number(btn.dataset.idx);
+      surveyAnswers[sid] = SURVEY.find(s => s.id === sid).choices[idx];
+      list.querySelectorAll(`.choice-btn[data-sid="${sid}"]`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      el('btnSurveyNext').disabled = Object.keys(surveyAnswers).length < SURVEY.length;
+    });
+  });
+}
+
+el('btnSurveyNext').addEventListener('click', () => {
+  showResult();
 });
 
 function stars(n){ return "★".repeat(n) + "☆".repeat(3-n); }
@@ -606,6 +622,7 @@ function tierFor(pct){
 
 function showResult(){
   screenQuestion.classList.add('hidden');
+  screenSurvey.classList.add('hidden');
   progressRow.classList.add('hidden');
   screenResult.classList.remove('hidden');
 
@@ -640,13 +657,14 @@ function showResult(){
     ts: new Date().toISOString(),
     score: correctCount, total, pct,
     usedExtra, detail: detailStr,
+    survey: surveyAnswers,
   };
   saveLocalBackup(record);
 
   const btnSubmit = el('btnSubmitForm');
   const hint = el('submitHint');
   if (FORM_CONFIGURED) {
-    lastFormUrl = buildFormUrl(correctCount, total, pct, usedExtra, detailStr);
+    lastFormUrl = buildFormUrl(correctCount, total, pct, usedExtra, detailStr, surveyAnswers);
     btnSubmit.classList.remove('hidden');
     hint.classList.remove('hidden');
     hint.textContent = '新しいタブが開きます。内容を確認して「送信」を押してください';
