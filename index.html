@@ -232,6 +232,31 @@
   }
   .review-item .src{margin-top:6px;font-size:12px;color:var(--ink-soft);font-style:italic;}
 
+  /* ---- inline answer feedback (shown right after answering) ---- */
+  .answer-feedback{
+    margin:2px 0 14px;padding:14px 16px;border-radius:14px;
+    border:1px solid var(--line);background:var(--paper-deep);
+  }
+  .answer-feedback .fb-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .answer-feedback .fb-head .flag{
+    flex:0 0 auto;width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;
+  }
+  .answer-feedback .fb-head .flag.correct{background:var(--ok);}
+  .answer-feedback .fb-head .flag.wrong{background:var(--ng);}
+  .answer-feedback .fb-head .fb-result{font-weight:700;color:var(--navy-deep);font-size:15.5px;}
+  .answer-feedback .row{margin-bottom:6px;font-size:13.5px;}
+  .answer-feedback .row .lab{color:var(--ink-soft);}
+  .answer-feedback .exp{
+    margin-top:4px;font-size:13.5px;color:var(--ink);
+    background:#fff;border-radius:10px;padding:10px 12px;
+  }
+  .answer-feedback .src{margin-top:6px;font-size:12px;color:var(--ink-soft);font-style:italic;}
+
+  .choice-btn.correct, .binary-btn.correct{border-color:var(--ok);background:#eef8f0;}
+  .choice-btn.wrong, .binary-btn.wrong{border-color:var(--ng);background:#fdeceb;}
+  .choice-btn.locked, .binary-btn.locked{cursor:default;}
+
   .footer-note{
     text-align:center;font-size:12px;color:var(--ink-soft);margin-top:28px;
   }
@@ -293,10 +318,10 @@
       </g>
     </svg></span>🧻🔦</div>
     <h2>発災後の「3日間」あなたはどうする？</h2>
-    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。伊那市・小黒川ならではの問題も交えた全15問（＋地元の追加問題）に挑戦して、あなたの防災度をチェックしましょう。参加無料・答えると最後に採点と解説が出ます。</p>
+    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。全15問の中からランダムに7問を出題（＋伊那市・小黒川ならではの追加問題）。1問答えるごとにその場で正解と解説が見られます。参加無料。</p>
     <div class="facts">
-      <div><span class="num">15</span><span class="lbl">基本問題</span></div>
-      <div><span class="num">3</span><span class="lbl">出題形式</span></div>
+      <div><span class="num">7</span><span class="lbl">ランダム出題</span></div>
+      <div><span class="num">+3</span><span class="lbl">地元の追加問題</span></div>
       <div><span class="num">★〜★★★</span><span class="lbl">難易度</span></div>
     </div>
     <label class="toggle-row" for="extraToggle">
@@ -322,8 +347,9 @@
       <button class="binary-btn" data-val="×"><span class="sym">×</span><span class="lbl">不適切・誤り</span></button>
     </div>
     <div id="multiChoices" class="choices hidden"></div>
+    <div id="answerFeedback" class="answer-feedback hidden"></div>
     <div class="nav-row">
-      <button class="ghost" id="btnBack">戻る</button>
+      <button class="ghost" id="btnEnd">終了</button>
       <button class="primary" id="btnNext" disabled>次へ</button>
     </div>
   </section>
@@ -467,6 +493,17 @@ function initStaffPanel(){
 let usedExtra = false;
 let lastFormUrl = "";
 let surveyAnswers = {};
+let endedEarly = false;
+
+const MAIN_QUIZ_COUNT = 7;
+function shuffleArray(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 const el = (id) => document.getElementById(id);
 const screenStart = el('screen-start');
@@ -495,10 +532,12 @@ fetch('quiz-data.json', { cache: 'no-store' })
 el('btnStart').addEventListener('click', () => {
   const useExtra = el('extraToggle').checked;
   usedExtra = useExtra;
-  quiz = useExtra ? MAIN_QUIZ.concat(LOCAL_BONUS) : MAIN_QUIZ.slice();
+  const pickedMain = shuffleArray(MAIN_QUIZ).slice(0, Math.min(MAIN_QUIZ_COUNT, MAIN_QUIZ.length));
+  quiz = useExtra ? pickedMain.concat(LOCAL_BONUS) : pickedMain;
   current = 0;
   answers = {};
   surveyAnswers = {};
+  endedEarly = false;
   screenStart.classList.add('hidden');
   screenResult.classList.add('hidden');
   screenSurvey.classList.add('hidden');
@@ -507,15 +546,20 @@ el('btnStart').addEventListener('click', () => {
   renderQuestion();
 });
 
-el('btnBack').addEventListener('click', () => {
-  if (current === 0) {
-    screenQuestion.classList.add('hidden');
-    progressRow.classList.add('hidden');
-    screenStart.classList.remove('hidden');
+el('btnEnd').addEventListener('click', () => {
+  const answeredCount = Object.keys(answers).length;
+  if (answeredCount === 0) {
+    if (confirm('クイズを終了してトップに戻りますか？')) {
+      screenQuestion.classList.add('hidden');
+      progressRow.classList.add('hidden');
+      screenStart.classList.remove('hidden');
+    }
     return;
   }
-  current -= 1;
-  renderQuestion();
+  if (confirm('クイズを終了しますか？ここまで回答した' + answeredCount + '問で結果を表示します。')) {
+    endedEarly = true;
+    showResult();
+  }
 });
 
 el('btnNext').addEventListener('click', () => {
@@ -565,6 +609,27 @@ el('btnSurveyNext').addEventListener('click', () => {
 
 function stars(n){ return "★".repeat(n) + "☆".repeat(3-n); }
 
+function buildFeedbackHtml(item){
+  const given = answers[item.id];
+  let isCorrect, correctText;
+  if (item.kind === 'binary') {
+    isCorrect = given === item.answer;
+    correctText = item.answer;
+  } else {
+    isCorrect = given === item.answer;
+    correctText = item.choices[item.answer];
+  }
+  return `
+    <div class="fb-head">
+      <div class="flag ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓' : '✗'}</div>
+      <div class="fb-result">${isCorrect ? '正解です！' : '残念、不正解…'}</div>
+    </div>
+    ${isCorrect ? '' : `<div class="row"><span class="lab">正解：</span><strong>${correctText}</strong></div>`}
+    <div class="exp">${item.exp}</div>
+    <div class="src">出典：${item.source}</div>
+  `;
+}
+
 function renderQuestion(){
   const item = quiz[current];
   el('qType').textContent = item.type;
@@ -574,16 +639,28 @@ function renderQuestion(){
 
   const binaryBox = el('binaryChoices');
   const multiBox = el('multiChoices');
-  const prev = answers[item.id];
+  const fb = el('answerFeedback');
+  const given = answers[item.id];
+  const answered = given !== undefined;
 
   if (item.kind === 'binary') {
     binaryBox.classList.remove('hidden');
     multiBox.classList.add('hidden');
     multiBox.innerHTML = '';
     [...binaryBox.querySelectorAll('.binary-btn')].forEach(btn => {
-      btn.classList.toggle('selected', prev === btn.dataset.val);
+      const val = btn.dataset.val;
+      btn.classList.remove('selected', 'correct', 'wrong', 'locked');
+      if (answered) {
+        btn.classList.add('locked');
+        if (val === item.answer) btn.classList.add('correct');
+        if (val === given) {
+          btn.classList.add('selected');
+          if (val !== item.answer) btn.classList.add('wrong');
+        }
+      }
       btn.onclick = () => {
-        answers[item.id] = btn.dataset.val;
+        if (answers[item.id] !== undefined) return;
+        answers[item.id] = val;
         renderQuestion();
       };
     });
@@ -594,9 +671,19 @@ function renderQuestion(){
     const labels = ['a','b','c','d'];
     item.choices.forEach((c, i) => {
       const b = document.createElement('button');
-      b.className = 'choice-btn' + (prev === i ? ' selected' : '');
+      let cls = 'choice-btn';
+      if (answered) {
+        cls += ' locked';
+        if (i === item.answer) cls += ' correct';
+        if (i === given) {
+          cls += ' selected';
+          if (i !== item.answer) cls += ' wrong';
+        }
+      }
+      b.className = cls;
       b.innerHTML = '<span class="k">' + labels[i] + '</span><span>' + c + '</span>';
       b.onclick = () => {
+        if (answers[item.id] !== undefined) return;
         answers[item.id] = i;
         renderQuestion();
       };
@@ -604,9 +691,20 @@ function renderQuestion(){
     });
   }
 
-  el('btnNext').disabled = answers[item.id] === undefined;
-  el('btnNext').textContent = (current === quiz.length - 1) ? '採点する' : '次へ';
-  el('btnBack').textContent = (current === 0) ? 'トップへ' : '戻る';
+  if (answered) {
+    fb.innerHTML = buildFeedbackHtml(item);
+    fb.classList.remove('hidden');
+  } else {
+    fb.innerHTML = '';
+    fb.classList.add('hidden');
+  }
+
+  el('btnNext').disabled = !answered;
+  if (current === quiz.length - 1) {
+    el('btnNext').textContent = SURVEY.length > 0 ? 'アンケートへ' : '結果を見る';
+  } else {
+    el('btnNext').textContent = '次へ';
+  }
 
   const pct = Math.round(((current) / quiz.length) * 100);
   el('progressFill').style.width = pct + '%';
@@ -626,8 +724,10 @@ function showResult(){
   progressRow.classList.add('hidden');
   screenResult.classList.remove('hidden');
 
+  const activeQuiz = endedEarly ? quiz.filter(item => answers[item.id] !== undefined) : quiz;
+
   let correctCount = 0;
-  const rows = quiz.map(item => {
+  const rows = activeQuiz.map(item => {
     const given = answers[item.id];
     let isCorrect, yourText, correctText;
     if (item.kind === 'binary') {
@@ -643,7 +743,7 @@ function showResult(){
     return {item, isCorrect, yourText, correctText};
   });
 
-  const total = quiz.length;
+  const total = activeQuiz.length;
   const pct = Math.round((correctCount / total) * 100);
   el('scoreRing').style.setProperty('--pct', pct);
   el('scoreNum').textContent = correctCount;
