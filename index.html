@@ -318,9 +318,9 @@
       </g>
     </svg></span>🧻🔦</div>
     <h2>発災後の「3日間」あなたはどうする？</h2>
-    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。全15問の中からランダムに7問を出題（＋伊那市・小黒川ならではの追加問題）。1問答えるごとにその場で正解と解説が見られます。参加無料。</p>
+    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。全15問の中からランダムに10問を出題（＋伊那市・小黒川ならではの追加問題）。1問答えるごとにその場で正解と解説が見られます。参加無料。</p>
     <div class="facts">
-      <div><span class="num">7</span><span class="lbl">ランダム出題</span></div>
+      <div><span class="num">10</span><span class="lbl">ランダム出題</span></div>
       <div><span class="num">+3</span><span class="lbl">地元の追加問題</span></div>
       <div><span class="num">★〜★★★</span><span class="lbl">難易度</span></div>
     </div>
@@ -495,7 +495,7 @@ let lastFormUrl = "";
 let surveyAnswers = {};
 let endedEarly = false;
 
-const MAIN_QUIZ_COUNT = 7;
+const MAIN_QUIZ_COUNT = 10;
 function shuffleArray(arr){
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -583,9 +583,8 @@ function showSurvey(){
   SURVEY.forEach(sq => {
     const block = document.createElement('div');
     block.className = 'survey-q';
-    const labels = ['a','b','c','d'];
     const choicesHtml = sq.choices.map((c, i) =>
-      `<button class="choice-btn" data-sid="${sq.id}" data-idx="${i}"><span class="k">${labels[i]}</span><span>${c}</span></button>`
+      `<button class="choice-btn" data-sid="${sq.id}" data-idx="${i}"><span class="k">${choiceLabel(i)}</span><span>${c}</span></button>`
     ).join('');
     block.innerHTML = `<div class="sq-text">${sq.q}</div><div class="choices">${choicesHtml}</div>`;
     list.appendChild(block);
@@ -608,6 +607,17 @@ el('btnSurveyNext').addEventListener('click', () => {
 });
 
 function stars(n){ return "★".repeat(n) + "☆".repeat(3-n); }
+
+function choiceLabel(i){
+  // a, b, c, ... z, aa, ab, ... (何個選択肢が増えても文字が表示されるように)
+  let s = '';
+  let n = i;
+  do {
+    s = String.fromCharCode(97 + (n % 26)) + s;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return s;
+}
 
 function buildFeedbackHtml(item){
   const given = answers[item.id];
@@ -668,7 +678,6 @@ function renderQuestion(){
     binaryBox.classList.add('hidden');
     multiBox.classList.remove('hidden');
     multiBox.innerHTML = '';
-    const labels = ['a','b','c','d'];
     item.choices.forEach((c, i) => {
       const b = document.createElement('button');
       let cls = 'choice-btn';
@@ -681,7 +690,7 @@ function renderQuestion(){
         }
       }
       b.className = cls;
-      b.innerHTML = '<span class="k">' + labels[i] + '</span><span>' + c + '</span>';
+      b.innerHTML = '<span class="k">' + choiceLabel(i) + '</span><span>' + c + '</span>';
       b.onclick = () => {
         if (answers[item.id] !== undefined) return;
         answers[item.id] = i;
