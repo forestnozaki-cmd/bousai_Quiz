@@ -47,25 +47,32 @@
   header.top{
     display:flex;
     align-items:center;
-    gap:14px;
+    gap:8px;
     padding:6px 2px 20px;
     border-bottom:2px solid var(--line);
     margin-bottom:22px;
   }
   header.top .badge{
-    width:46px;height:46px;flex:0 0 auto;
+    width:36px;height:36px;flex:0 0 auto;
     border-radius:50%;
     background:var(--navy);
     display:flex;align-items:center;justify-content:center;
-    font-size:22px;
+    font-size:17px;
   }
   header.top .titles{flex:1;min-width:0;}
   header.top .kicker{
     font-size:13.5px;letter-spacing:.01em;color:var(--soba);font-weight:500;margin-top:3px;
   }
   header.top h1{
-    margin:0;font-size:19px;color:var(--navy-deep);font-weight:700;
+    margin:0;font-size:16px;color:var(--navy-deep);font-weight:700;
     font-family:'Zen Kaku Gothic New', sans-serif;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .qcount-badge{
+    flex:0 0 auto;font-family:'Kaisei Decol',serif;font-size:12px;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+    border-radius:99px;padding:4px 10px;white-space:nowrap;
+    box-shadow:0 4px 10px -4px rgba(183,134,44,.6);
   }
 
   /* ---- progress ---- */
@@ -91,8 +98,10 @@
   }
   .start p{color:var(--ink-soft);margin:0 0 14px;font-size:15px;}
   .start .facts{
-    display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0 22px;
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 22px;
   }
+  .start .cta-line{margin:4px 0 6px;}
+  .start .cta-sub{margin:0 0 16px;}
   .start .facts div{
     background:var(--paper-deep);border-radius:12px;padding:12px 8px;text-align:center;
   }
@@ -285,6 +294,7 @@
     <div class="titles">
       <h1 id="headerTitle">荒井区防災チャレンジクイズ</h1>
     </div>
+    <div id="qCountBadge" class="qcount-badge hidden">1 / 13</div>
   </header>
 
   <div id="progressRow" class="progress-row hidden">
@@ -329,19 +339,13 @@
       </g>
     </svg></span>🧻🔦</div>
     <h2>発災後の「3日間」あなたはどうする？</h2>
-    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。全15問の中からランダムに10問を出題（＋伊那市・小黒川ならではの追加問題）。1問答えるごとにその場で正解と解説が見られます。参加無料。</p>
+    <p>地震や大雨のあと、家庭で本当に困るのはトイレ・水・電気。全15問の中からランダムに10問を出題（＋伊那市・小黒川ならではの問題）。1問答えるごとにその場で正解と解説が見られます。</p>
     <div class="facts">
       <div><span class="num">10</span><span class="lbl">ランダム出題</span></div>
-      <div><span class="num">+3</span><span class="lbl">地元の追加問題</span></div>
-      <div><span class="num">★〜★★★</span><span class="lbl">難易度</span></div>
+      <div><span class="num">+3</span><span class="lbl">地元の問題</span></div>
     </div>
-    <label class="toggle-row" for="extraToggle">
-      <input type="checkbox" id="extraToggle" checked />
-      <div>
-        <div class="t-title">伊那市・小黒川の追加問題も出す（＋3問）</div>
-        <div class="t-sub">小黒川渓谷キャンプ場や伊那市防災ハンドブックにちなんだご当地問題です</div>
-      </div>
-    </label>
+    <h2 class="cta-line">クイズとアンケートに答えて景品をもらおう</h2>
+    <p class="cta-sub">令和８年度行者そば祭り防災コーナー企画</p>
     <button class="primary" id="btnStart" disabled>読み込み中…</button>
   </section>
 
@@ -568,16 +572,16 @@ fetch('quiz-data.json', { cache: 'no-store' })
 
 
 el('btnStart').addEventListener('click', () => {
-  const useExtra = el('extraToggle').checked;
-  usedExtra = useExtra;
+  usedExtra = true;
   const pickedMain = shuffleArray(MAIN_QUIZ).slice(0, Math.min(MAIN_QUIZ_COUNT, MAIN_QUIZ.length));
-  quiz = useExtra ? pickedMain.concat(LOCAL_BONUS) : pickedMain;
+  quiz = pickedMain.concat(LOCAL_BONUS);
   current = 0;
   answers = {};
   surveyAnswers = {};
   endedEarly = false;
   setHeaderTitle(DEFAULT_HEADER_TITLE);
-  setHeaderVisible(false);
+  setHeaderVisible(true);
+  el('qCountBadge').classList.remove('hidden');
   screenStart.classList.add('hidden');
   screenResult.classList.add('hidden');
   screenSurvey.classList.add('hidden');
@@ -591,6 +595,7 @@ el('btnEnd').addEventListener('click', () => {
     if (confirm('クイズを終了してトップに戻りますか？')) {
       setHeaderTitle(DEFAULT_HEADER_TITLE);
       setHeaderVisible(true);
+      el('qCountBadge').classList.add('hidden');
       screenQuestion.classList.add('hidden');
       progressRow.classList.add('hidden');
       screenStart.classList.remove('hidden');
@@ -622,6 +627,7 @@ el('btnNext').addEventListener('click', () => {
 function showSurvey(){
   setHeaderTitle('アンケートのお願い');
   setHeaderVisible(true);
+  el('qCountBadge').classList.add('hidden');
   screenQuestion.classList.add('hidden');
   progressRow.classList.add('hidden');
   screenSurvey.classList.remove('hidden');
@@ -699,6 +705,7 @@ function renderQuestion(){
   const isLastQuestion = current === quiz.length - 1;
   el('lastQNotice').classList.toggle('hidden', !isLastQuestion);
   el('btnEnd').classList.toggle('hidden', isLastQuestion);
+  el('qCountBadge').textContent = (current + 1) + ' / ' + quiz.length;
 
   const binaryBox = el('binaryChoices');
   const multiBox = el('multiChoices');
@@ -825,6 +832,7 @@ function renderResultScreen({ score, total, pct, tier, sub, rows, formUrl }){
 function showResult(){
   setHeaderTitle(DEFAULT_HEADER_TITLE);
   setHeaderVisible(true);
+  el('qCountBadge').classList.add('hidden');
   screenQuestion.classList.add('hidden');
   screenSurvey.classList.add('hidden');
   progressRow.classList.add('hidden');
@@ -879,6 +887,7 @@ function showResult(){
 function showRestoredResult(snapshot){
   setHeaderTitle(DEFAULT_HEADER_TITLE);
   setHeaderVisible(true);
+  el('qCountBadge').classList.add('hidden');
   screenStart.classList.add('hidden');
   screenQuestion.classList.add('hidden');
   screenSurvey.classList.add('hidden');
