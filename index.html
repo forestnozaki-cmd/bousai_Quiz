@@ -555,8 +555,17 @@ const screenResult = el('screen-result');
 const progressRow = el('progressRow');
 initStaffPanel();
 
+// ---- オフライン対応（通信の悪い会場でも、一度オンラインで開いておけばキャッシュから動作します）----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => {
+      console.error('サービスワーカーの登録に失敗しました（オフライン機能のみ利用不可。通常の表示には影響しません）', err);
+    });
+  });
+}
+
 // ---- クイズデータの読み込み（quiz-data.json を index.html と同じ場所に置いてください）----
-fetch('quiz-data.json', { cache: 'no-store' })
+fetch('quiz-data.json')
   .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
   .then(data => {
     MAIN_QUIZ = data.mainQuiz || [];
