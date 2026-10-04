@@ -34,7 +34,7 @@
     color:var(--ink);
     font-family:'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
     min-height:100vh;
-    line-height:1.75;
+    line-height:1.4;
     -webkit-font-smoothing:antialiased;
   }
   .display{font-family:'Kaisei Decol', 'Zen Kaku Gothic New', serif;}
@@ -139,7 +139,7 @@
   .pill.local{color:var(--ok);border-color:#bcdfc6;background:#eef8f0;}
   .q-text{
     font-size:18.5px;font-weight:700;color:var(--navy-deep);margin:0 0 22px;
-    line-height:1.75;
+    line-height:1.4;
   }
   .choices{display:flex;flex-direction:column;gap:10px;margin-bottom:6px;}
   .choice-btn{
@@ -178,7 +178,7 @@
 
   .nav-row{display:flex;gap:10px;margin-top:22px;}
   .nav-row button.primary{flex:1;}
-  .nav-row button.ghost{flex:0 0 96px;}
+  .nav-row button.ghost{flex:0 0 112px;font-size:13px;padding-left:10px;padding-right:10px;white-space:nowrap;}
   button:disabled{opacity:.4;cursor:not-allowed;}
 
   /* ---- result screen ---- */
@@ -280,7 +280,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
+  <header class="top" id="siteHeader">
     <div class="badge">🚨</div>
     <div class="titles">
       <h1 id="headerTitle">荒井区防災チャレンジクイズ</h1>
@@ -289,7 +289,7 @@
 
   <div id="progressRow" class="progress-row hidden">
     <div class="progress-track"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
-    <div id="progressLabel" class="progress-label">0 / 15</div>
+    <div id="progressLabel" class="progress-label hidden">0 / 15</div>
   </div>
 
   <!-- START -->
@@ -361,7 +361,7 @@
     <div id="multiChoices" class="choices hidden"></div>
     <div id="answerFeedback" class="answer-feedback hidden"></div>
     <div class="nav-row">
-      <button class="ghost" id="btnEnd">終了</button>
+      <button class="ghost" id="btnEnd">途中で終了</button>
       <button class="primary" id="btnNext" disabled>次へ</button>
     </div>
   </section>
@@ -516,6 +516,10 @@ function setHeaderTitle(text){
   const h = document.getElementById('headerTitle');
   if (h) h.textContent = text;
 }
+function setHeaderVisible(visible){
+  const h = document.getElementById('siteHeader');
+  if (h) h.classList.toggle('hidden', !visible);
+}
 function scrollToTop(){
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 }
@@ -573,11 +577,11 @@ el('btnStart').addEventListener('click', () => {
   surveyAnswers = {};
   endedEarly = false;
   setHeaderTitle(DEFAULT_HEADER_TITLE);
+  setHeaderVisible(false);
   screenStart.classList.add('hidden');
   screenResult.classList.add('hidden');
   screenSurvey.classList.add('hidden');
   screenQuestion.classList.remove('hidden');
-  progressRow.classList.remove('hidden');
   renderQuestion();
 });
 
@@ -586,6 +590,7 @@ el('btnEnd').addEventListener('click', () => {
   if (answeredCount === 0) {
     if (confirm('クイズを終了してトップに戻りますか？')) {
       setHeaderTitle(DEFAULT_HEADER_TITLE);
+      setHeaderVisible(true);
       screenQuestion.classList.add('hidden');
       progressRow.classList.add('hidden');
       screenStart.classList.remove('hidden');
@@ -593,9 +598,13 @@ el('btnEnd').addEventListener('click', () => {
     }
     return;
   }
-  if (confirm('クイズを終了しますか？ここまで回答した' + answeredCount + '問で結果を表示します。')) {
+  if (confirm('クイズを途中で終了しますか？ここまで回答した' + answeredCount + '問で結果を表示します。')) {
     endedEarly = true;
-    showResult();
+    if (SURVEY.length > 0) {
+      showSurvey();
+    } else {
+      showResult();
+    }
   }
 });
 
@@ -612,6 +621,7 @@ el('btnNext').addEventListener('click', () => {
 
 function showSurvey(){
   setHeaderTitle('アンケートのお願い');
+  setHeaderVisible(true);
   screenQuestion.classList.add('hidden');
   progressRow.classList.add('hidden');
   screenSurvey.classList.remove('hidden');
@@ -686,7 +696,9 @@ function renderQuestion(){
   el('qDiff').textContent = stars(item.diff);
   el('qLocal').classList.toggle('hidden', !item.local);
   el('qText').textContent = item.q;
-  el('lastQNotice').classList.toggle('hidden', current !== quiz.length - 1);
+  const isLastQuestion = current === quiz.length - 1;
+  el('lastQNotice').classList.toggle('hidden', !isLastQuestion);
+  el('btnEnd').classList.toggle('hidden', isLastQuestion);
 
   const binaryBox = el('binaryChoices');
   const multiBox = el('multiChoices');
@@ -812,6 +824,7 @@ function renderResultScreen({ score, total, pct, tier, sub, rows, formUrl }){
 
 function showResult(){
   setHeaderTitle(DEFAULT_HEADER_TITLE);
+  setHeaderVisible(true);
   screenQuestion.classList.add('hidden');
   screenSurvey.classList.add('hidden');
   progressRow.classList.add('hidden');
@@ -865,6 +878,7 @@ function showResult(){
 // ---- 直近の結果を画面に復元する（フォーム送信でタブ/ページが切り替わっても、開き直せば点数を確認できる）----
 function showRestoredResult(snapshot){
   setHeaderTitle(DEFAULT_HEADER_TITLE);
+  setHeaderVisible(true);
   screenStart.classList.add('hidden');
   screenQuestion.classList.add('hidden');
   screenSurvey.classList.add('hidden');
